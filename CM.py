@@ -2,7 +2,7 @@
 """
 CryptoMobile: library to provide python bindings to mobile cryptographic
 reference implementation. 
-Copyright (C) 2013 Benoit Michau
+Copyright (C) 2013 Benoit Michau, ANSSI
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
