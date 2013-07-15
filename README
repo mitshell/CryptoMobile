@@ -1,0 +1,158 @@
+#####################################
+###     CryptoMobile toolkit      ###
+#####################################
+
+The toolkit implements python wrapper around 3G and LTE encryption and 
+integrity protection algorithms.
+This is delivered for study only:
+Beware that cryptographic material, especially ciphering algorithms are 
+always subjected to national regulation.
+Moreover, use in real networks and equipments of some of the algorithms provided
+are subect to royalties to be paid to the GSMA.
+
+
+*** UMTS encryption and integrity-protection:
+
+* UEA1 and UIA1 are the initial UMTS F8 and F9 functions for ciphering and
+integrity protection. They are based on the Kasumi block cipher.
+Specifications are public, but use is restricted: 
+fees must be paid to GSMA, and Mitsubishi (patent holder for the initial 
+Misty block-cipher)
+
+* UEA2 and UIA2 are the secondary UMTS F8 and F9 functions for ciphering and
+integrity protection. They are based on the SNOW3G stream cipher.
+Specifications are public, but use is restricted: 
+fees must be paid to GSMA (or ETSI ?), the patent holder of SNOW initial 
+stream-cipher does not request any money :)
+
+*** LTE encryption and integrity-protection:
+
+* UEA1 and UIA1 are one of the initial LTE set of functions for ciphering and
+integrity protection. They are based on the SNOW3G stream cipher.
+Specifications are public, but use is restricted: 
+fees must be paid to GSMA (or ETSI ?), the patent holder on SNOW initial 
+stream-cipher does not request any money :)
+
+* UEA2 and UIA2 are one of the initial LTE set of functions for ciphering and
+integrity protection. They are based on the AES block cipher.
+Specifications are public, but use is restricted: 
+fees must be paid to GSMA, the patent holders on AES does not request any money :)
+This library implements it through pyCrypto, which already contains AES
+efficient code.
+
+* UEA3 and UIA3 are a new LTE set of functions for ciphering and
+integrity protection. They are based on the ZUC stream cipher.
+Specifications are public, but use is restricted: 
+fees must be paid to GSMA, the patent holder on ZUC may request money (TBC)
+
+
+For all algorithms that have public specifications and that are not already
+provided within pyCrypto, a source C code is taken from the reference C code
+provided in the several 3GPP, ETSI, GSMA specifications.
+All C codes can compile on Linux as .so or in Windows as .dll, a priori on both
+32 and 64 bits systems. They may compile on other systems too.
+They are not optimized in any way.
+
+Python classes and methods are wrapping those native libraries thanks to the 
+"ctypes" python library.
+
+
+#############################
+###     Installation      ###
+#############################
+
+1) Compiling C source codes to shared libraries:
+only tested on x86 Little Endian architecture
+
+*** on Windows system
+
+* with cl compiler from MS visual studio
+>cl /LD /O2 Kasumi.c
+>cl /LD /O2 SNOW_3G.c
+>cl /LD /O2 ZUC.c
+
+* with tcc compiler from F. Bellard
+>tcc -shared -o Kasumi.dll Kasumi.c
+>tcc -shared -o SNOW_3G.dll SNOW_3G.c
+>tcc -shared -o ZUC.dll ZUC.c
+
+*** on Linux system
+
+* with gcc compiler
+$ gcc -c -O2 -fPIC Kasumi.c -o Kasumi.o && gcc -shared -Wl -o Kasumi.so Kasumi.o
+$ gcc -c -O2 -fPIC SNOW_3G.c -o SNOW_3G.o && gcc -shared -Wl -o SNOW_3G.so SNOW_3G.o
+$ gcc -c -O2 -fPIC ZUC.c -o ZUC.o && gcc -shared -Wl -o ZUC.so ZUC.o
+
+
+2) Configuring the CryptoMobile/ directory to python path
+
+*** on Windows system
+copy the CryptoMobile/ directory containing the .dll and .py files to 
+C:\Python2X\Lib\site-packages\
+
+*** on Linux system
+setup your environment variable PYTHONPATH to reference the directory where
+you have the CryptoMobile/ directory containing the .so and .py file (this way,
+you need to adjust some path in the CM.py file)
+or 
+copy the CryptoMobile/ directory containing the .so and .py files to 
+/usr/local/lib/python2.X/site-packages/ (this way, you may have to adjust some 
+path in the CM.py file, too...)
+
+*** configure CM.py
+configure the "library_path" global variable in the CM.py file, to reference
+the path where the files are available, and the "library_suf" global variable
+for the C library extension in use (.dll on Windows, .so on Linux).
+
+#####################
+###     Usage     ###
+#####################
+
+classes defined:
+KASUMI()
+SNOW3G()
+ZUC()
+AES_3GPP()
+methods shortcut:
+# for 3G
+UEA1 = KASUMI().F8
+UIA1 = KASUMI().F9
+UEA2 = SNOW3G().F8
+UIA2 = SNOW3G().F9
+# For LTE
+EEAI = SNOW3G().F8
+EIA1 = SNOW3G().EIA1
+EEA2 = AES_3GPP().EEA2
+EIA2 = AES_3GPP().EIA2
+EEA3 = ZUC().EEA3
+EIA3 = ZUC().EIA3
+
+>>> from CryptoMobile.CM import *
+>>> dir()
+['AES_3GPP', 'EEA1', 'EEA2', 'EEA3', 'EIA1', 'EIA2', 'EIA3', 'KASUMI', 'SNOW3G', 'UEA1', 'UEA2', 'UIA1', 'UIA2', 'ZUC', '__builtins__', '__doc__', '__name__', '__package__']
+>>> UIA2(key=16*'\xab', count=0x1234, fresh=0x986532ab, dir=0, data=100*'nepascourirauborddelapiscine')
+':\xe5t:'
+>>> UEA2(key=16*'\xab', count=0x1234, bearer=0x8, dir=0, data=100*'nepascourirauborddelapiscine')
+'\x03Z\xa0\x83\x14\x198l\x1b\x91\\\x94\x18\xfc\xbd\xecb-\xdfs1\xd6\xbb1\x88y\xf0\xc9\xf5\xec\xc5\x1b\x7f\xcc...'
+>>> UEA2(key=16*'\xab', count=0x1234, bearer=0x8, dir=0, data=_)
+'nepascourirauborddelapiscinenepascourirauborddelapiscinenepascourirauborddelapiscinenepascourirauborddelapi...'
+
+>>> help(EEA2)
+Help on method EEA2 in module CryptoMobile.CM:
+EEA2(self, key='\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00', count=0, bearer=0, dir=0, data='', bitlen=None) method of CryptoMobile.CM.AES_3GPP instance
+
+>>> EEA2(key=16*'\xc1', count=0x9955ab, bearer=0x16, dir=1, data=50*'MonPantalonS\'EstDecousu', bitlen=1149)
+'-y\xf1\xee\xb7\xe4\x0c\xf2\xdfz`\xb04"\x8c\xda\xc8B!n\x863V"\xaei\x91\x1b\xc5\xfc\x1dx\xb9l\xe8\x99q\\q\x88\x91\xc8f\r\x05\xdf\x94S\x97\xc0\x96\xb75\x00@\...'
+>>> EEA2(key=16*'\xc1', count=0x9955ab, bearer=0x16, dir=1, data=_, bitlen=1149)
+"MonPantalonS'EstDecousuMonPantalonS'EstDecousuMonPantalonS'EstDecousuMonPantalonS'EstDecousuMonPantalonS'EstDecousuMonPantalonS'EstDecousuMonPah"
+>>> EIA3(key=16*'\xc1', count=0x9955ab, bearer=0x16, dir=1, data=50*'MonPantalonS\'EstDecousu', bitlen=1149)
+'\xa9\xc5h\x9e'
+
+*** There are also all test vectors implemented in the test module.
+
+# If you get a "False" on "testall()", this means something is going wrong.
+>>> from CryptoMobile.test import *
+>>> testall()
+True
+>>> testperf()
+1000 full testsets in 35.739 seconds
