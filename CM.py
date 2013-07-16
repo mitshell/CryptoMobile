@@ -48,8 +48,8 @@ try:
                'UEA1', 'UIA1', 'UEA2', 'UIA2', \
                'EEA1', 'EIA1', 'EEA2', 'EIA2', 'EEA3', 'EIA3']
 except ImportError:
-    log('WNG', '[Import] Crypto.Cipher.AES from pycrypto not found\n' \
-        '[-] EEA2 / EIA2 not available')
+    print('WNG', '[Import] Crypto.Cipher.AES from pycrypto not found\n' \
+          '[-] EEA2 / EIA2 not available')
     # filter * export
     __all__ = ['KASUMI', 'SNOW3G', 'ZUC', 'AES_3GPP', \
                'UEA1', 'UIA1', 'UEA2', 'UIA2', \
