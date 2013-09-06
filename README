@@ -43,7 +43,14 @@ efficient code.
 * UEA3 and UIA3 are a new LTE set of functions for ciphering and
 integrity protection. They are based on the ZUC stream cipher.
 Specifications are public, but use is restricted: 
-fees must be paid to GSMA, the patent holder on ZUC may request money (TBC)
+fees must be paid to GSMA, the patent holder on ZUC may request money (TBC).
+
+*** Milenage, base for 2G (USIM), 3G and LTE authentication:
+
+* Milenage is the base algorithm for the AKA authentication developped within
+the 3GPP standard. It is based on the AES block-cipher (making use of pyCrypto).
+Milenage is also used in EAP-AKA and IMS-AKA protocols. Specifications are public
+and use should not be restricted, AFAIK.
 
 
 For all algorithms that have public specifications and that are not already
