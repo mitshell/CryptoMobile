@@ -8,6 +8,8 @@
 #	define EXPORTIT
 #endif
 
+#include <stdlib.h>
+
 /*------------------------------------------------------------------------
  * ZUC.h
  * Code taken from the ZUC specification
