@@ -1,23 +1,31 @@
 # −*− coding: UTF−8 −*−
-"""
-CryptoMobile: library to provide python bindings to mobile cryptographic
-reference implementation. 
-Copyright (C) 2013 Benoit Michau, ANSSI
+#/**
+# * Software Name : CryptoMobile 
+# * Version : 0.1.0
+# *
+# * Copyright © 2013. Benoit Michau. ANSSI.
+# *
+# * This program is free software: you can redistribute it and/or modify
+# * it under the terms of the GNU General Public License version 2 as published
+# * by the Free Software Foundation. 
+# *
+# * This program is distributed in the hope that it will be useful,
+# * but WITHOUT ANY WARRANTY; without even the implied warranty of
+# * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# * GNU General Public License for more details. 
+# *
+# * You will find a copy of the terms and conditions of the GNU General Public
+# * License version 2 in the "license.txt" file or
+# * see http://www.gnu.org/licenses/ or write to the Free Software Foundation,
+# * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
+# *
+# *--------------------------------------------------------
+# * File Name : CryptoMobile/CM.py
+# * Created : 2013-07-13
+# * Authors : Benoit Michau 
+# *--------------------------------------------------------
+#*/
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with this program; if not, write to the Free Software Foundation, Inc.,
-51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-"""
 ########################################################
 # CryptoMobile python toolkit
 #
@@ -34,6 +42,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #######################################################
 
 import os
+import sys
 from math import ceil
 from struct import pack, unpack
 from binascii import hexlify, unhexlify
@@ -44,16 +53,18 @@ from ctypes import *
 try:
     from Crypto.Cipher import AES
     # filter * export
-    __all__ = ['KASUMI', 'SNOW3G', 'ZUC', 'AES_3GPP', \
-               'UEA1', 'UIA1', 'UEA2', 'UIA2', \
+    __all__ = ['CryMo', 'KASUMI', 'SNOW3G', 'ZUC', 'AES_3GPP',
+               'UEA1', 'UIA1', 'UEA2', 'UIA2',
                'EEA1', 'EIA1', 'EEA2', 'EIA2', 'EEA3', 'EIA3']
+    with_pycrypto = True
 except ImportError:
     print('[WNG] [Import] Crypto.Cipher.AES from pycrypto not found\n' \
-          '[-] EEA2 / EIA2 not available')
+           '[-] EEA2 / EIA2 not available')
     # filter * export
-    __all__ = ['KASUMI', 'SNOW3G', 'ZUC', 'AES_3GPP', \
-               'UEA1', 'UIA1', 'UEA2', 'UIA2', \
+    __all__ = ['CryMo', 'KASUMI', 'SNOW3G', 'ZUC', 
+               'UEA1', 'UIA1', 'UEA2', 'UIA2',
                'EEA1', 'EIA1', 'EEA3', 'EIA3']
+    with_pycrypto = False
 
 
 # convinience functions: change their content if you want
@@ -61,22 +72,29 @@ def log(level='DBG', msg=''):
     # log wrapper
     print('[%s] %s' % (level, msg))
 
+# class and exception wrapper for all crypto-mobile algorithms
+class CryMo(object):
+    pass
+
 class CMException(Exception):
-    # exception wrapper
     pass
 
 
 # GLOBAL WARNING:
 # Endianness management may be messy...
-# Tested successfully on x86 LE 32 bits only
+# Tested successfully on x86 32 and 64 bits only
 #
 # compiled shared library path (.dll on windows, .so on Linux)
-# TODO: manages the following with some automation
 #
-library_path = 'C:/Python27/Lib/site-packages/CryptoMobile/'
-#library_path = '/home/toto/python/CryptoMobile/'
-library_suf = '.dll'
-#library_suf = '.so'
+#library_path = 'C:/Python27/Lib/site-packages/CryptoMobile/'
+#library_path = '/home/mich/python/CryptoMobile/'
+library_path = '%s/' % os.path.dirname(os.path.abspath( __file__ ))
+#
+#library_suf = '.dll'
+library_suf = '.so'
+if sys.platform[:3] == 'win':
+    library_suf = '.dll'
+#
 library_name = ['SNOW_3G', 'Kasumi', 'ZUC']
 
 def load_lib(name=None):
@@ -108,7 +126,7 @@ def read_arubyte(arubyte=(c_ubyte)):
 # python wrapper to Kasumi reference C code
 ###
 
-class KASUMI:
+class KASUMI(CryMo):
     '''
     UMTS initial encryption / integrity protection algorithm
     It is a block cipher, working with:
@@ -242,7 +260,7 @@ class KASUMI:
 # python wrapper to SNOW3G reference C code
 ###
 
-class SNOW3G:
+class SNOW3G(CryMo):
     '''
     UMTS secondary encryption / integrity protection algorithm
     It is a pseudo-random generator, working with:
@@ -392,7 +410,7 @@ class SNOW3G:
 # python wrapper to ZUC reference C code 
 ###
 
-class ZUC:
+class ZUC(CryMo):
     '''
     LTE 3rd encryption / integrity protection algorithm
     It is a pseudo-random generator, working with:
@@ -544,18 +562,25 @@ class ZUC:
         return pack('!I', out_c.value)
     
 
+###
+# python wrapper to pycrypto AES
+###
 #
-# Initialize pycrypto AES block cipher constants
-AES.key_size = 16
-AES.block_size = 16
-aes_ecb = lambda key, data: AES.new(key, AES.MODE_ECB).encrypt(data)
+AES_key_size = 16
+AES_block_size = 16
+if with_pycrypto:
+    # Initialize pycrypto AES block cipher constants
+    AES.key_size = AES_key_size
+    AES.block_size = AES_block_size
+    aes_ecb = lambda key, data: AES.new(key, AES.MODE_ECB).encrypt(data)
+#
 xor_str = lambda a, b: ''.join(map(chr, [ord(a[i])^ord(b[i]) for i in \
                                range(min(len(a), len(b)))] ))
 _pow64 = 0x10000000000000000
 
 # Define a class for AES_CTR and AES_CMAC as specified in TS 33.401
-# AES_CMAC is in 800-38B
-class AES_3GPP:
+# AES_CMAC is defined in NIST 800-38B
+class AES_3GPP(CryMo):
     '''
     LTE 2nd encryption / integrity protection algorithm
     It is AES-based, working with:
@@ -631,7 +656,7 @@ class AES_3GPP:
         return pack('!QQ', K1/_pow64, K1%_pow64), \
                pack('!QQ', K2/_pow64, K2%_pow64)
     
-    def AES_CMAC(self, K=16*'\0', M='', Tlen=AES.block_size*8, Mlen=None):
+    def AES_CMAC(self, K=16*'\0', M='', Tlen=AES_block_size*8, Mlen=None):
         # prepare bit length
         if not isinstance(Mlen, (int, long)) or Mlen < 0 or Mlen > len(M)*8:
             Mlen = len(M)*8
@@ -643,8 +668,7 @@ class AES_3GPP:
                 M = ''.join((M[:-1], \
                     chr(ord(M[-1:]) & (0x100 - (1<<lastbits))) ))
         # define parameters for iterating
-        b_size = AES.block_size
-        b = b_size*8
+        b = AES_block_size*8
         # n is useless, as we iterate directly over Mlist:
         #n = int(ceil(Mlen / float(b))) if Mlen else 1
         # K1, K2 subkeys
@@ -653,7 +677,8 @@ class AES_3GPP:
             print('K1: %s' % hexlify(K1))
             print('K2: %s' % hexlify(K2))
         # message divided into blocks of length b, and last Mn taken out
-        Mlist = [M[i:i+b_size] for i in range(0, int(ceil(Mlen/8.0)), b_size)]
+        Mlist = [M[i:i+AES_block_size] \
+                 for i in range(0, int(ceil(Mlen/8.0)), AES_block_size)]
         #print Mlist
         if Mlist:
             Mn = Mlist.pop()
@@ -683,7 +708,7 @@ class AES_3GPP:
             Mn = xor_str(Mn, K2)
         Mlist.append(Mn)
         # loop over the message to MAC it
-        C = b_size * '\0'
+        C = AES_block_size * '\0'
         for Mi in Mlist:
             #print('Mi: %s' % hexlify(Mi))
             C = aes_ecb(K, xor_str(C, Mi))
@@ -748,18 +773,26 @@ class AES_3GPP:
 #
 ###################
 # DEFINE 3GPP ALG #
+# convinient for  #
+# python export   #
 ###################
-# For 3G
-UEA1 = KASUMI().F8
-UIA1 = KASUMI().F9
-UEA2 = SNOW3G().F8
-UIA2 = SNOW3G().F9
-# For LTE
-EEA1 = SNOW3G().F8
-EIA1 = SNOW3G().EIA1
-EEA2 = AES_3GPP().EEA2
-EIA2 = AES_3GPP().EIA2
-EEA3 = ZUC().EEA3
-EIA3 = ZUC().EIA3
 #
+K = KASUMI()
+S = SNOW3G()
+Z = ZUC()
+if with_pycrypto:
+    A = AES_3GPP()
+# For 3G
+UEA1 = K.F8
+UIA1 = K.F9
+UEA2 = S.F8
+UIA2 = S.F9
+# For LTE
+EEA1 = S.F8
+EIA1 = S.EIA1
+EEA3 = Z.EEA3
+EIA3 = Z.EIA3
+if with_pycrypto:
+    EEA2 = A.EEA2
+    EIA2 = A.EIA2
 #
