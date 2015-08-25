@@ -86,9 +86,9 @@ only tested on x86 Little Endian architecture
 *** on Linux system
 
 * with gcc compiler
-$ gcc -c -O2 -fPIC Kasumi.c -o Kasumi.o && gcc -shared -Wl -o Kasumi.so Kasumi.o
-$ gcc -c -O2 -fPIC SNOW_3G.c -o SNOW_3G.o && gcc -shared -Wl -o SNOW_3G.so SNOW_3G.o
-$ gcc -c -O2 -fPIC ZUC.c -o ZUC.o && gcc -shared -Wl -o ZUC.so ZUC.o
+$ gcc -c -O2 -fPIC Kasumi.c -o Kasumi.o && gcc -shared -o Kasumi.so Kasumi.o
+$ gcc -c -O2 -fPIC SNOW_3G.c -o SNOW_3G.o && gcc -shared -o SNOW_3G.so SNOW_3G.o
+$ gcc -c -O2 -fPIC ZUC.c -o ZUC.o && gcc -shared -o ZUC.so ZUC.o
 
 
 2) Configuring the CryptoMobile/ directory to python path
