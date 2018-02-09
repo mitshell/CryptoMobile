@@ -243,7 +243,7 @@ void ClockLFSRInitializationMode(u32 F)
 * See section 3.4.5.
 */
 
-void ClockLFSRKeyStreamMode()
+void ClockLFSRKeyStreamMode(void)
 {
 	u32 v = ( ( (LFSR_S0 << 8) & 0xffffff00 ) ^
 		( MULalpha( (u8)((LFSR_S0>>24) & 0xff) ) ) ^
@@ -275,7 +275,7 @@ void ClockLFSRKeyStreamMode()
 * See Section 3.4.6.
 */
 
-u32 ClockFSM()
+u32 ClockFSM(void)
 {
 	u32 F = ( ( LFSR_S15 + FSM_R1 ) & 0xffffffff ) ^ FSM_R2 ;
 	u32 r = ( FSM_R2 + ( FSM_R3 ^ LFSR_S5 ) ) & 0xffffffff ;
@@ -502,9 +502,10 @@ u8 mask8bit(int n)
 u8* f9( u8* key, u32 count, u32 fresh, u32 dir, u8 *data, u64 length)
 {
 	u32 K[4],IV[4], z[5];
-	u32 i=0, D;
+	u32 i=0;
 	static u8 MAC_I[4] = {0,0,0,0}; /* static memory for the result */
-	u64 EVAL;
+	u64 D;
+    u64 EVAL;
 	u64 V;
 	u64 P;
 	u64 Q;

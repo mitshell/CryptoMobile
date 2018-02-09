@@ -61,4 +61,3 @@ EXPORTIT void f8( u8 *key, u32 count, u32 bearer, u32 dir, \
 /* compute a 3GPP MAC on a message */
 EXPORTIT u8 * f9( u8 *key, u32 count, u32 fresh, u32 dir, \
                   u8 *data, int length );
-

@@ -1,5 +1,5 @@
 CC?=gcc
-OPTS=-c -Wall -fPIC $(CFLAGS) $(CPPFLAGS)
+OPTS=-c -O2 -Wall -fPIC $(CFLAGS) $(CPPFLAGS)
 SHARED_OPTS=-shared -fPIC
 SOURCES=Kasumi.c SNOW_3G.c ZUC.c
 OBJECTS=$(SOURCES:.c=.o)

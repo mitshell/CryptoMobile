@@ -70,4 +70,3 @@ EXPORTIT void f8( u8 *key, u32 count, u32 bearer, u32 dir, \
 
 EXPORTIT u8* f9( u8* key, u32 count, u32 fresh, u32 dir, \
                  u8 *data, u64 length);
-

@@ -82,7 +82,7 @@ u32 EK_d[16] = {
 };
 
 /* ——————————————————————- */ 
-/* c = a + b mod (2^31 – 1) */
+/* c = a + b mod (2^31 E1) */
 u32 AddM(u32 a, u32 b)
 {
 	u32 c = a + b;
@@ -129,7 +129,7 @@ void LFSRWithInitialisationMode(u32 u)
 }
 
 /* LFSR with work mode */
-void LFSRWithWorkMode()
+void LFSRWithWorkMode(void)
 {
 	u32 f, v;
 	f = LFSR_S0;
@@ -165,7 +165,7 @@ void LFSRWithWorkMode()
 }
 
 /* BitReorganization */
-void BitReorganization()
+void BitReorganization(void)
 {
 	BRC_X0 = ((LFSR_S15 & 0x7FFF8000) << 1) | (LFSR_S14 & 0xFFFF);
 	BRC_X1 = ((LFSR_S11 & 0xFFFF) << 16) | (LFSR_S9 >> 15);
@@ -189,7 +189,7 @@ u32 L2(u32 X)
 
 #define MAKEU32(a, b, c, d) (((u32)(a) << 24) | ((u32)(b) << 16) | ((u32)(c) << 8) | ((u32)(d)))
 /* F */
-u32 F()
+u32 F(void)
 {
 	u32 W, W1, W2, u, v;
 	
@@ -247,7 +247,7 @@ EXPORTIT void Initialization(u8* k, u8* iv)
 
 EXPORTIT void GenerateKeystream(u32* pKeystream, u32 KeystreamLen)
 {
-	int i;
+	u32 i;
 	BitReorganization();
 	F(); 			/* discard the output of F */
 	LFSRWithWorkMode();
@@ -313,11 +313,11 @@ EXPORTIT void EEA3(u8* CK, u32 COUNT, u32 BEARER, u32 DIRECTION,
 	for (i=0; i<L; i++)
 		C[i] = M[i] ^ z[i];
 
-	/* zero last bits of data in case its length is not  word-aligned (32 bits)
+	/* zero last bits of data in case its length is not word-aligned (32 bits)
 	   this is an addition to the C reference code, which did not handle it */
 	if (lastbits)
         i--;
-		C[i] &= 0x100000000 - (1<<lastbits);
+		C[i] &= 0x100000000 - (u32)(1<<lastbits);
 	
 	free(z);
 }

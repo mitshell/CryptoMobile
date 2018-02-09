@@ -332,8 +332,11 @@ EXPORTIT void f8(u8 *key, u32 count, u32 bearer, u32 dir, u8 *data, int length)
 	/* zero last bits of data in case its length is not byte-aligned 
 	   this is an addition to the C reference code, which did not handle it */
 	if (lastbits)
-		*data-- ;
-		*data &= 256 - (1<<lastbits) ;
+	{
+	    // the following decrementing raises a compiler warning
+		data--;
+		*data &= 256 - (1<<lastbits);
+	}
 }
 
 /*-----------------------------------------------------------

@@ -25,7 +25,7 @@ typedef unsigned int u32;
  * k: secret key (input, 16 bytes)
  * iv: initialization vector (input, 16 bytes)
  * Keystream: produced keystream (output, variable length)
- * KeystreamLen: length in bits requested for the keystream (input)
+ * KeystreamLen: length in 32-bit words requested for the keystream (input)
 */
 EXPORTIT void Initialization(u8* k, u8* iv);
 EXPORTIT void GenerateKeystream(u32* pKeystream, u32 KeystreamLen);
@@ -49,7 +49,7 @@ EXPORTIT void EEA3(u8* CK, u32 COUNT, u32 BEARER, u32 DIRECTION,
  * DIRECTION
  * LENGTH: length of the frame in bits
  * M: original message (input)
- * C: processed message (output)
+ * MAC: processed message MAC (output)
 */
 EXPORTIT void EIA3(u8* IK, u32 COUNT, u32 BEARER, u32 DIRECTION,
 		           u32 LENGTH, u32* M, u32* MAC);
