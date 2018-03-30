@@ -1,7 +1,7 @@
 # −*− coding: UTF−8 −*−
 
 import os
-import distutils.ccompiler as dist_ccomp
+import distutils.ccompiler     as dist_ccomp
 import distutils.command.build as dist_build
 #
 from setuptools                 import setup, Extension
@@ -65,6 +65,6 @@ setup(
                 'in C of mobile cryptographic algorithms: Comp128, Milenage, Kasumi, SNOW-3G, ZUC',
     long_description=open('README.md', 'r').read(),
     url='https://github.com/mitshell/CryptoMobile/',
-    keywords='cryptography mobile network',
+    keywords='cryptography mobile network Kasumi SNOW ZUC Milenage Comp128',
     license='GPLv2+',
     )
