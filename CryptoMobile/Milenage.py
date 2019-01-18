@@ -1,9 +1,9 @@
 # −*− coding: UTF−8 −*−
 #/**
 # * Software Name : CryptoMobile 
-# * Version : 0.2
+# * Version : 0.3
 # *
-# * Copyright © 2013. Benoit Michau. ANSSI.
+# * Copyright 2013. Benoit Michau. ANSSI.
 # *
 # * This program is free software: you can redistribute it and/or modify
 # * it under the terms of the GNU General Public License version 2 as published
