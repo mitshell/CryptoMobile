@@ -23,11 +23,13 @@ if dist_ccomp.get_default_compiler() == 'msvc':
     pykasumi  = Extension('pykasumi',  sources=['C_py/pykasumi.cc', 'C_alg/Kasumi.cc'])
     pysnow    = Extension('pysnow',    sources=['C_py/pysnow.cc', 'C_alg/SNOW_3G.cc'])
     pyzuc     = Extension('pyzuc',     sources=['C_py/pyzuc.cc', 'C_alg/ZUC.cc'])
+    pykeccakp1600 = Extension('pykeccakp1600', sources=['C_py/pykeccakp1600.cc', 'C_alg/KeccakP-1600-3gpp.cc'])
 else:
     pycomp128 = Extension('pycomp128', sources=['C_py/pycomp128.c', 'C_alg/comp128.c'])
     pykasumi  = Extension('pykasumi',  sources=['C_py/pykasumi.c', 'C_alg/Kasumi.c'])
     pysnow    = Extension('pysnow',    sources=['C_py/pysnow.c', 'C_alg/SNOW_3G.c'])
     pyzuc     = Extension('pyzuc',     sources=['C_py/pyzuc.c', 'C_alg/ZUC.c'])
+    pykeccakp1600 = Extension('pykeccakp1600', sources=['C_py/pykeccakp1600.c', 'C_alg/KeccakP-1600-3gpp.c'])
 
 def postop():
     if dist_ccomp.get_default_compiler() == 'msvc':
@@ -51,20 +53,20 @@ class install_wrapper(install):
 
 setup(
     name='CryptoMobile',
-    version='0.2',
+    version='0.3',
     cmdclass={'install': install_wrapper,
               'build'  : build_wrapper},
     packages=['CryptoMobile'],
-    ext_modules=[pycomp128, pykasumi, pysnow, pyzuc],
+    ext_modules=[pycomp128, pykasumi, pysnow, pyzuc, pykeccakp1600],
     
     test_suite="test.test_CryptoMobile",
     
     author='Benoit Michau',
     author_email='michau.benoit@gmail.com',
     description='CryptoMobile provides (C)Python bindings to reference implementations '\
-                'in C of mobile cryptographic algorithms: Comp128, Milenage, Kasumi, SNOW-3G, ZUC',
+                'in C of mobile cryptographic algorithms: Comp128, Milenage, TUAK, Kasumi, SNOW-3G, ZUC',
     long_description=open('README.md', 'r').read(),
-    url='https://github.com/mitshell/CryptoMobile/',
-    keywords='cryptography mobile network Kasumi SNOW ZUC Milenage Comp128',
+    url='https://github.com/P1Sec/CryptoMobile/',
+    keywords='cryptography mobile network Kasumi SNOW ZUC Milenage Comp128 TUAK',
     license='GPLv2+',
     )

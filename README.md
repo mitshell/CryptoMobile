@@ -2,7 +2,8 @@
 
 ## About
 This toolkit implements python wrappers around 3G and LTE encryption and 
-integrity protection algorithms, COMP128 and Milenage authentication algorithms.
+integrity protection algorithms, COMP128, Milenage and TUAK authentication 
+algorithms.
 
 ## Disclaimer
 This is delivered for study only: beware that cryptographic material, 
@@ -144,6 +145,16 @@ Some conversion functions are also provided in the Milenage module: conv_C2, con
 conv_C4 and conv_C5 for 2G / 3G authentication vectors conversion ; conv_A2, conv_A3, 
 conv_A4 and conv_A7 for LTE key derivation and 3G / LTE authentication vectors conversion.
 
+### TUAK
+This is the Python wrapper over the TUAK algorithm. The mode of operation is written
+is Python, and makes use of the KeccakP-1600 permutation function. The C code for this
+permutation function has been taken from the 3GPP TS 35.231 specification.
+
+Here is an example on how to use it:
+```
+TODO
+```
+
 ### Kasumi-based encryption and integrity protection algorithms
 This is a Python wrapper around the reference C code of Kasumi and its mode of operation
 for 3G networks. Kasumi is a block cipher working with 64 bit blocks.
@@ -273,18 +284,20 @@ b"MonPantalonS'EstDecousuMonPantalonS'EstDecousuMonPantalonS'EstDecousuMonPantal
 b'\xa9\xc5h\x9e'
 ```
 
-### running UMTS and LTE algorithms test vectors
+### running TUAK, UMTS and LTE algorithms test vectors
 By running the setup test (see installation), test vectors will all be run.
 You can also run some performance test by hand:
 
 ```
-$ python test/test_CM.py
-1000 full testsets in 25.970 seconds
+$ python3 -m test.test_CM
+1000 full testsets in 7.246 seconds
+$ python3 -m test.test_TUAK
+10000 full testsets in 2.322 seconds
 ```
 
 ## Content
 The library is structured into 3 main parts:
-- C_alg: provides C source codes for comp128, Kasumi, SNOW 3G and ZUC
+- C_alg: provides C source codes for comp128, KeccakP-1600, Kasumi, SNOW 3G and ZUC
 - C_py: provides C source files wrapping those algorithms with CPython (for both 
   Python2 and Python3)
 - CryptoMobile: provides Python source files.
@@ -302,6 +315,7 @@ Within the CryptoMobile directory, we have to following modules:
   and functions UEA1, UIA1, UEA2, UIA2, EEA1, EIA1, EEA2, EIA2, EEA3 and EIA3. 
 - Milenage.py: provides the Milenage algorithm and conversion functions to be used
   for keys and authentication vectors conversion.
+- TUAK.py: provides the TUAK algorithm.
 
 ## Credits
 - ETSI / SAGE for providing public cryptographic specifications, together with
