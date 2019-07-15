@@ -1,3 +1,10 @@
+/* -----------------------------------------------------------------------
+ * code extracted from 3GPP TS 35.202, annex 2, for core functions
+ * https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=2387
+ * code extracted from 3GPP TS 35.201, annex 2, for F8 and F9 functions
+ * https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=2386
+ *-----------------------------------------------------------------------*/
+
 /*-----------------------------------------------------------------------
  *						Kasumi.c
  *-----------------------------------------------------------------------

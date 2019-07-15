@@ -1,6 +1,9 @@
-/* 
-    copied from 3GPP TS 35.231
-    This code may be freely used or adapted.
+/* -----------------------------------------------------------------------
+ * code extracted from 3GPP TS 35.231, annex E for Keccak core functions
+ * https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=2402
+ *-----------------------------------------------------------------------*/
+
+/* This code may be freely used or adapted.
 */
 
 #include "KeccakP-1600-3gpp.h"

@@ -1,6 +1,18 @@
+/* -----------------------------------------------------------------------
+ * code extracted from ETSI / SAGE specification of the 3GPP Confidentiality and Integrity Algorithms UEA2 & UIA2.
+ * Document 2: SNOW 3G Specification. Version 1.1 from the 6th September 2006, annex 4.
+ * https://www.gsma.com/security/wp-content/uploads/2019/05/snow3gspec.pdf
+ * code extracted from ETSI / SAGE specification of the 3GPP Confidentiality and Integrity Algorithms UEA2 & UIA2.
+ * Document 1: UEA2 and UIA2 Specification. Version 2.1 from the 16th March 2009, annex 4.
+ * https://www.gsma.com/security/wp-content/uploads/2019/05/uea2uia2d1v21.pdf
+ *
+ * All updated SNOW 3G specifications maybe found on the GSMA website:
+ * https://www.gsma.com/security/security-algorithms/
+ *-----------------------------------------------------------------------*/
+
 /*------------------------------------------------------------------------
-* SNOW_3G.c
-*------------------------------------------------------------------------*/
+ * SNOW_3G.c
+ *------------------------------------------------------------------------*/
 
 #include "SNOW_3G.h"
 
@@ -72,11 +84,11 @@ u8 SQ[256] = {
 };
 
 /* MULx.
-* Input V: an 8-bit input.
-* Input c: an 8-bit input.
-* Output : an 8-bit output.
-* See section 3.1.1 for details.
-*/
+ * Input V: an 8-bit input.
+ * Input c: an 8-bit input.
+ * Output : an 8-bit output.
+ * See section 3.1.1 for details.
+ */
 
 u8 MULx(u8 V, u8 c)
 {
@@ -87,12 +99,12 @@ u8 MULx(u8 V, u8 c)
 }
 
 /* MULxPOW.
-* Input V: an 8-bit input.
-* Input i: a positive integer.
-* Input c: an 8-bit input.
-* Output : an 8-bit output.
-* See section 3.1.2 for details.
-*/
+ * Input V: an 8-bit input.
+ * Input i: a positive integer.
+ * Input c: an 8-bit input.
+ * Output : an 8-bit output.
+ * See section 3.1.2 for details.
+ */
 
 u8 MULxPOW(u8 V, u8 i, u8 c)
 {
@@ -103,10 +115,10 @@ u8 MULxPOW(u8 V, u8 i, u8 c)
 }
 
 /* The function MUL alpha.
-* Input c: 8-bit input.
-* Output : 32-bit output.
-* See section 3.4.2 for details.
-*/
+ * Input c: 8-bit input.
+ * Output : 32-bit output.
+ * See section 3.4.2 for details.
+ */
 
 u32 MULalpha(u8 c)
 {
@@ -117,10 +129,10 @@ u32 MULalpha(u8 c)
 }
 
 /* The function DIV alpha.
-* Input c: 8-bit input.
-* Output : 32-bit output.
-* See section 3.4.3 for details.
-*/
+ * Input c: 8-bit input.
+ * Output : 32-bit output.
+ * See section 3.4.3 for details.
+ */
 
 u32 DIValpha(u8 c)
 {
@@ -131,10 +143,10 @@ u32 DIValpha(u8 c)
 }
 
 /* The 32x32-bit S-Box S1
-* Input: a 32-bit input.
-* Output: a 32-bit output of S1 box.
-* See section 3.3.1.
-*/
+ * Input: a 32-bit input.
+ * Output: a 32-bit output of S1 box.
+ * See section 3.3.1.
+ */
 
 u32 S1(u32 w)
 {
@@ -169,10 +181,10 @@ u32 S1(u32 w)
 }
 
 /* The 32x32-bit S-Box S2
-* Input: a 32-bit input.
-* Output: a 32-bit output of S2 box.
-* See section 3.3.2.
-*/
+ * Input: a 32-bit input.
+ * Output: a 32-bit output of S2 box.
+ * See section 3.3.2.
+ */
 
 u32 S2(u32 w)
 {
@@ -206,10 +218,10 @@ u32 S2(u32 w)
 }
 
 /* Clocking LFSR in initialization mode.
-* LFSR Registers S0 to S15 are updated as the LFSR receives a single clock.
-* Input F: a 32-bit word comes from output of FSM.
-* See section 3.4.4.
-*/
+ * LFSR Registers S0 to S15 are updated as the LFSR receives a single clock.
+ * Input F: a 32-bit word comes from output of FSM.
+ * See section 3.4.4.
+ */
 
 void ClockLFSRInitializationMode(u32 F)
 {
@@ -239,9 +251,9 @@ void ClockLFSRInitializationMode(u32 F)
 }
 
 /* Clocking LFSR in keystream mode.
-* LFSR Registers S0 to S15 are updated as the LFSR receives a single clock.
-* See section 3.4.5.
-*/
+ * LFSR Registers S0 to S15 are updated as the LFSR receives a single clock.
+ * See section 3.4.5.
+ */
 
 void ClockLFSRKeyStreamMode(void)
 {
@@ -270,10 +282,10 @@ void ClockLFSRKeyStreamMode(void)
 }
 
 /* Clocking FSM.
-* Produces a 32-bit word F.
-* Updates FSM registers R1, R2, R3.
-* See Section 3.4.6.
-*/
+ * Produces a 32-bit word F.
+ * Updates FSM registers R1, R2, R3.
+ * See Section 3.4.6.
+ */
 
 u32 ClockFSM(void)
 {
@@ -286,11 +298,11 @@ u32 ClockFSM(void)
 }
 
 /* Initialization.
-* Input k[4]: Four 32-bit words making up 128-bit key.
-* Input IV[4]: Four 32-bit words making 128-bit initialization variable.
-* Output: All the LFSRs and FSM are initialized for key generation.
-* See Section 4.1.
-*/
+ * Input k[4]: Four 32-bit words making up 128-bit key.
+ * Input IV[4]: Four 32-bit words making 128-bit initialization variable.
+ * Output: All the LFSRs and FSM are initialized for key generation.
+ * See Section 4.1.
+ */
 
 EXPORTIT void Initialize(u32 k[4], u32 IV[4])
 {
@@ -323,12 +335,12 @@ EXPORTIT void Initialize(u32 k[4], u32 IV[4])
 }
 
 /* Generation of Keystream.
-* input n: number of 32-bit words of keystream.
-* input z: space for the generated keystream, assumes
-* memory is allocated already.
-* output: generated keystream which is filled in z
-* See section 4.2.
-*/
+ * input n: number of 32-bit words of keystream.
+ * input z: space for the generated keystream, assumes
+ * memory is allocated already.
+ * output: generated keystream which is filled in z
+ * See section 4.2.
+ */
 
 EXPORTIT void GenerateKeystream(u32 n, u32 *ks)
 {
@@ -347,12 +359,12 @@ EXPORTIT void GenerateKeystream(u32 n, u32 *ks)
 }
 
 /*-----------------------------------------------------------------------
-* end of SNOW_3G.c
-*-----------------------------------------------------------------------*/
+ * end of SNOW_3G.c
+ *-----------------------------------------------------------------------*/
 
 /*---------------------------------------------------------
-* f8.c
-*---------------------------------------------------------*/
+ * f8.c
+ *---------------------------------------------------------*/
 
 /*
 #include "f8.h"
@@ -362,18 +374,18 @@ EXPORTIT void GenerateKeystream(u32 n, u32 *ks)
 */
 
 /* f8.
-* Input key: 128 bit Confidentiality Key.
-* Input count:32-bit Count, Frame dependent input.
-* Input bearer: 5-bit Bearer identity (in the LSB side).
-* Input dir:1 bit, direction of transmission.
-* Input data: length number of bits, input bit stream.
-* Input length: 32 bit Length, i.e., the number of bits to be encrypted or
-* decrypted.
-* Output data: Output bit stream. Assumes data is suitably memory
-* allocated.
-* Encrypts/decrypts blocks of data between 1 and 2^32 bits in length as
-* defined in Section 3.
-*/
+ * Input key: 128 bit Confidentiality Key.
+ * Input count:32-bit Count, Frame dependent input.
+ * Input bearer: 5-bit Bearer identity (in the LSB side).
+ * Input dir:1 bit, direction of transmission.
+ * Input data: length number of bits, input bit stream.
+ * Input length: 32 bit Length, i.e., the number of bits to be encrypted or
+ * decrypted.
+ * Output data: Output bit stream. Assumes data is suitably memory
+ * allocated.
+ * Encrypts/decrypts blocks of data between 1 and 2^32 bits in length as
+ * defined in Section 3.
+ */
 
 EXPORTIT void f8(u8 *key, u32 count, u32 bearer, u32 dir, u8 *data, u32 length)
 {

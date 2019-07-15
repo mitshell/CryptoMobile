@@ -1,3 +1,16 @@
+/* -----------------------------------------------------------------------
+ * code extracted from ETSI / SAGE specification of the 3GPP Confidentiality and Integrity Algorithms 128-EEA3 & 128-EIA3.
+ * Document 2: ZUC Specification. Version 1.6 from 28th June 2011, appendix A.
+ * https://www.gsma.com/security/wp-content/uploads/2019/05/eea3eia3zucv16.pdf
+ * code extracted from ETSI / SAGE specification of the 3GPP Confidentiality and Integrity Algorithms 128-EEA3 & 128-EIA3.
+ * Document 1: 128-EEA3 and 128-EIA3 Specification. Version 1.7 from the 30th December 2011, annex 1.
+ * https://www.gsma.com/security/wp-content/uploads/2019/05/EEA3_EIA3_specification_v1_8.pdf
+ * (warning: only link to version 1.9 exists)
+ *
+ * All updated ZUC specifications maybe found on the GSMA website:
+ * https://www.gsma.com/security/security-algorithms/
+ *-----------------------------------------------------------------------*/
+
 /*---------------------------------------------
  * ZUC / EEA3 / EIA3 : LTE security algorithm
  *--------------------------------------------*/
@@ -81,8 +94,7 @@ u32 EK_d[16] = {
 0x4D78, 0x2F13, 0x6BC4, 0x1AF1, 0x5E26, 0x3C4D, 0x789A, 0x47AC
 };
 
-/* óóóóóóóóóóóóóóóóóóóóóó- */ 
-/* c = a + b mod (2^31 ÅE1) */
+/* c = a + b mod (2^31 - E1) */
 u32 AddM(u32 a, u32 b)
 {
 	u32 c = a + b;
@@ -90,7 +102,9 @@ u32 AddM(u32 a, u32 b)
 }
 
 /* LFSR with initialization mode */
+
 #define MulByPow2(x, k) ((((x) << k) | ((x) >> (31 - k))) & 0x7FFFFFFF)
+
 void LFSRWithInitialisationMode(u32 u)
 {
 	u32 f, v;
@@ -188,6 +202,7 @@ u32 L2(u32 X)
 }
 
 #define MAKEU32(a, b, c, d) (((u32)(a) << 24) | ((u32)(b) << 16) | ((u32)(c) << 8) | ((u32)(d)))
+
 /* F */
 u32 F(void)
 {
@@ -209,6 +224,7 @@ u32 F(void)
 }
 
 #define MAKEU31(a, b, c) (((u32)(a) << 23) | ((u32)(b) << 8) | (u32)(c))
+
 /* initialize */
 EXPORTIT void Initialization(u8* k, u8* iv)
 {

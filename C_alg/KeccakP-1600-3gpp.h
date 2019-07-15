@@ -1,5 +1,10 @@
+/* -----------------------------------------------------------------------
+ * code extracted from 3GPP TS 35.231, annex E for Keccak core functions
+ * https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=2402
+ *-----------------------------------------------------------------------*/
+
 /* this is the trick to make the code cross-platform
-*  at least, Win32 / Linux */
+ * at least, Win32 / Linux */
 
 #if defined(_WIN32) || defined(__WIN32__)
 #	include <windows.h>

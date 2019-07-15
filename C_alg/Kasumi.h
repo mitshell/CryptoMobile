@@ -1,5 +1,12 @@
+/* -----------------------------------------------------------------------
+ * code extracted from 3GPP TS 35.202, annex 2, for core functions
+ * https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=2387
+ * code extracted from 3GPP TS 35.201, annex 2, for F8 and F9 functions
+ * https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=2386
+ *-----------------------------------------------------------------------*/
+
 /* this is the trick to make the code cross-platform
-*  at least, Win32 / Linux */
+ * at least, Win32 / Linux */
 
 #if defined(_WIN32) || defined(__WIN32__)
 #	include <windows.h>
