@@ -1,9 +1,9 @@
 # -*- coding: UTF-8 -*-
 #/**
 # * Software Name : CryptoMobile
-# * Version : 0.2
+# * Version : 0.3
 # *
-# * Copyright 2018. Benoit Michau.
+# * Copyright 2018. Benoit Michau. P1Sec.
 # *
 # * This program is free software: you can redistribute it and/or modify
 # * it under the terms of the GNU General Public License version 2 as published
@@ -26,6 +26,6 @@
 # *--------------------------------------------------------
 #*/
 #
-__all__ = ['test_CM']
-__version__ = '0.2.0'
+__all__ = ['test_CM', 'test_TUAK', 'test_CryptoMobile']
+__version__ = '0.3'
 
