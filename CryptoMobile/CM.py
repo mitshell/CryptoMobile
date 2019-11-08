@@ -360,6 +360,7 @@ class AES_3GPP(object):
         #
         if bitlen is None:
             bitlen = 8*len(data_in)
+            lastbits = None
         else:
             lastbits = (8-(bitlen%8))%8
             blen = bitlen >> 3
