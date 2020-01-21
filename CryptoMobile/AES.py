@@ -81,7 +81,7 @@ else:
 class AES_ECB_pycrypto(object):
     """AES in ECB mode"""
     
-    blocksize = 16
+    block_size = 16
     
     def __init__(self, key):
         """initialize AES in ECB mode with the given key"""
@@ -95,7 +95,7 @@ class AES_ECB_pycrypto(object):
 class AES_ECB_pycryptodome(object):
     """AES in ECB mode"""
     
-    blocksize = 16
+    block_size = 16
     
     def __init__(self, key):
         """initialize AES in ECB mode with the given key"""
@@ -109,7 +109,7 @@ class AES_ECB_pycryptodome(object):
 class AES_ECB_cryptography(object):
     """AES in ECB mode"""
     
-    blocksize = 16
+    block_size = 16
     
     def __init__(self, key):
         """initialize AES in ECB mode with the given key"""
@@ -127,7 +127,7 @@ class AES_ECB_cryptography(object):
 class AES_CTR_pycrypto(object):
     """AES in CTR mode"""
     
-    blocksize = 16
+    block_size = 16
     
     def __init__(self, key, nonce):
         """initialize AES in ECB mode with the given key and nonce buffer
@@ -153,7 +153,7 @@ class AES_CTR_pycrypto(object):
 class AES_CTR_pycryptodome(object):
     """AES in CTR mode"""
     
-    blocksize = 16
+    block_size = 16
     
     def __init__(self, key, nonce):
         """initialize AES in ECB mode with the given key and nonce buffer
@@ -172,7 +172,7 @@ class AES_CTR_pycryptodome(object):
 class AES_CTR_cryptography(object):
     """AES in CTR mode"""
     
-    blocksize = 16
+    block_size = 16
     
     def __init__(self, key, nonce):
         """initialize AES in ECB mode with the given key and nonce buffer

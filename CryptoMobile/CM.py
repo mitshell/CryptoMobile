@@ -34,22 +34,6 @@ from pyzuc    import *
 from .utils   import *
 from .CMAC    import CMAC
 
-'''
-try:
-    from Crypto.Cipher import AES
-    # filter * export
-    __all__ = ['KASUMI', 'SNOW3G', 'ZUC', 'AES_3GPP',
-               'UEA1', 'UIA1', 'UEA2', 'UIA2',
-               'EEA1', 'EIA1', 'EEA2', 'EIA2', 'EEA3', 'EIA3']
-    _with_pycrypto = True
-except ImportError:
-    print('Pycrypto required for LTE EEA2 / EIA2: not available')
-    # filter * export
-    __all__ = ['KASUMI', 'SNOW3G', 'ZUC', 
-               'UEA1', 'UIA1', 'UEA2', 'UIA2',
-               'EEA1', 'EIA1', 'EEA3', 'EIA3']
-    _with_pycrypto = False
-'''
 try:
     from .AES import AES_CTR, AES_ECB
     # filter * export
@@ -57,14 +41,14 @@ try:
                'UEA1', 'UIA1', 'UEA2', 'UIA2',
                'EEA1', 'EIA1', 'EEA2', 'EIA2', 'EEA3', 'EIA3']
     _with_aes = True
-except ImportError:
-    print('AES backend required for LTE EEA2 / EIA2: not available')
+except ImportError as err:
+    print(err)
+    print('EEA2 / EIA2 not available')
     # filter * export
     __all__ = ['KASUMI', 'SNOW3G', 'ZUC', 
                'UEA1', 'UIA1', 'UEA2', 'UIA2',
                'EEA1', 'EIA1', 'EEA3', 'EIA3']
     _with_aes = False
-    
 
 
 class KASUMI(object):
@@ -360,17 +344,6 @@ class AES_3GPP(object):
         optional bitlen argument represents the length of data_in in bits
     """
     
-    '''
-    def __count(self):
-        if not hasattr(self, '_ctr_count'):
-            self._ctr_count = 0
-        else:
-            self._ctr_count += 1
-            if self._ctr_count == MAX_UINT64:
-                self._ctr_count = 0
-        return self._iv_64h + pack('>Q', self._ctr_count)
-    '''
-    
     def EEA2(self, key, count, bearer, dir, data_in, bitlen=None):
         # avoid uint32 under/overflow
         if not 0 <= count < MAX_UINT32 or \
@@ -388,11 +361,6 @@ class AES_3GPP(object):
             if blen < len(data_in):
                 data_in = data_in[:blen]
         #
-        '''
-        self._iv_64h = pack('>II', count, (bearer<<27)+(dir<<26))
-        self._ctr_count = -1
-        enc = AES.new(key, AES.MODE_CTR, counter=self.__count).encrypt(data_in)
-        '''
         nonce = pack('>II', count, (bearer<<27)+(dir<<26))
         enc = AES_CTR(key, nonce).encrypt(data_in)
         #
