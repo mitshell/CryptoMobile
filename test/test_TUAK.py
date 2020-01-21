@@ -20,7 +20,7 @@
 # * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 # *
 # *--------------------------------------------------------
-# * File Name : CryptoMobile/TUAK.py
+# * File Name : test/test_TUAK.py
 # * Created : 2018-12-20
 # * Authors : Benoit Michau 
 # *--------------------------------------------------------
