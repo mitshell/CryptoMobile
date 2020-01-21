@@ -50,9 +50,8 @@ class CMAC(object):
         key [X bytes]: key used by the cipher algorithm set in `ciphermod'
             length X must correspond to the given ciphermod key length
         ciphermod [encryption module]: block-cipher algorithm
-            must have `block_size' and `MODE_ECB` attributes,
-            `new(key, mode)' method, which returns an instance with 
-            an `encrypt(data_in)' method
+            must have `blocksize' attribute and `__init__(key)' method,
+            which returns an instance with an `encrypt(data_in)' method
         Tlen [int, optional]: requested MAC length (in bits)
         """
         # set the key
@@ -75,9 +74,9 @@ class CMAC(object):
     def __init_cipher(self, ciphermod):
         # set block-cipher and block size (in bits)
         self._ciphermod = ciphermod
-        self._blocksize = ciphermod.block_size
-        # init block cipher in ECB mode
-        self._cipher = ciphermod.new(self.key, ciphermod.MODE_ECB)
+        self._blocksize = ciphermod.blocksize
+        # init ECB-mode block cipher
+        self._cipher = ciphermod(self.key)
         # link to its encrypt() method
         self._encrypt = self._cipher.encrypt
         

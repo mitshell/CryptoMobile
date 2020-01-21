@@ -34,6 +34,7 @@ from pyzuc    import *
 from .utils   import *
 from .CMAC    import CMAC
 
+'''
 try:
     from Crypto.Cipher import AES
     # filter * export
@@ -48,6 +49,22 @@ except ImportError:
                'UEA1', 'UIA1', 'UEA2', 'UIA2',
                'EEA1', 'EIA1', 'EEA3', 'EIA3']
     _with_pycrypto = False
+'''
+try:
+    from .AES import AES_CTR, AES_ECB
+    # filter * export
+    __all__ = ['KASUMI', 'SNOW3G', 'ZUC', 'AES_3GPP',
+               'UEA1', 'UIA1', 'UEA2', 'UIA2',
+               'EEA1', 'EIA1', 'EEA2', 'EIA2', 'EEA3', 'EIA3']
+    _with_aes = True
+except ImportError:
+    print('AES backend required for LTE EEA2 / EIA2: not available')
+    # filter * export
+    __all__ = ['KASUMI', 'SNOW3G', 'ZUC', 
+               'UEA1', 'UIA1', 'UEA2', 'UIA2',
+               'EEA1', 'EIA1', 'EEA3', 'EIA3']
+    _with_aes = False
+    
 
 
 class KASUMI(object):
@@ -343,6 +360,7 @@ class AES_3GPP(object):
         optional bitlen argument represents the length of data_in in bits
     """
     
+    '''
     def __count(self):
         if not hasattr(self, '_ctr_count'):
             self._ctr_count = 0
@@ -351,6 +369,7 @@ class AES_3GPP(object):
             if self._ctr_count == MAX_UINT64:
                 self._ctr_count = 0
         return self._iv_64h + pack('>Q', self._ctr_count)
+    '''
     
     def EEA2(self, key, count, bearer, dir, data_in, bitlen=None):
         # avoid uint32 under/overflow
@@ -369,9 +388,13 @@ class AES_3GPP(object):
             if blen < len(data_in):
                 data_in = data_in[:blen]
         #
+        '''
         self._iv_64h = pack('>II', count, (bearer<<27)+(dir<<26))
         self._ctr_count = -1
         enc = AES.new(key, AES.MODE_CTR, counter=self.__count).encrypt(data_in)
+        '''
+        nonce = pack('>II', count, (bearer<<27)+(dir<<26))
+        enc = AES_CTR(key, nonce).encrypt(data_in)
         #
         if lastbits:
             # zero last bits
@@ -399,7 +422,7 @@ class AES_3GPP(object):
                 data_in = data_in[:blen]
         #
         M = pack('>II', count, (bearer<<27)+(dir<<26)) + data_in
-        cmac = CMAC(key, AES, Tlen=32)
+        cmac = CMAC(key, AES_ECB, Tlen=32)
         return cmac.cmac(M, 64+bitlen)
 
 
@@ -412,7 +435,7 @@ class AES_3GPP(object):
 _K = KASUMI()
 _S = SNOW3G()
 _Z = ZUC()
-if _with_pycrypto:
+if _with_aes:
     _A = AES_3GPP()
 # For 3G
 UEA1 = _K.F8
@@ -424,6 +447,6 @@ EEA1 = _S.F8
 EIA1 = _S.EIA1
 EEA3 = _Z.EEA3
 EIA3 = _Z.EIA3
-if _with_pycrypto:
+if _with_aes:
     EEA2 = _A.EEA2
     EIA2 = _A.EIA2
