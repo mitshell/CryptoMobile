@@ -30,11 +30,10 @@ package directory:
 ```
 python setup.py install
 ```
-or
+or to make a system-wide install
 ```
 sudo python setup.py install
 ```
-to make a system-wide install
 
 It is also possible to test the library before installing it:
 
@@ -51,18 +50,18 @@ python setup.py build
 For generic info on building C extensions on Windows, see the 
 [Python wiki](https://wiki.python.org/moin/WindowsCompilers).
 When building on a Windows system using the MSVC compiler, the .c files will be automatically
-renamed to .cc by the install script in order to get it compiled correctly by the MSVC compiler.
+renamed to .cc by the install script in order to get them compiled correctly by the MSVC compiler.
 
 ### Installing the ctypes version instead of the CPython wrappers
 There is still the possibility to install manually the historical version of tle library which uses
-Python-only _ctypes_ source files. A *CM_ctypes.py* is available in the _ctypes directory 
+Python-only _ctypes_ source files. A *CM_ctypes.py* is available in the \_ctypes directory 
 for this purpose.
-    
-TODO
 
 ## Usage
 Most of the classes and methods have docstrings. Just read them to get information
 on how to use and call them.
+
+
 Warning: most of the C reference implementations are using global or static variables,
 which are making them not thread-safe. Using them through Python is however OK thanks 
 to the GIL, but beware in case you want to use them directly from C.
@@ -105,7 +104,7 @@ Here is an example on how to use it:
 
 ### Milenage
 This is Python wrapper over the Milenage algorithm. The mode of operation is written
-in Python, and makes use of the AES function from the pycrypto package.
+in Python, and makes use of the AES function from one of the AES Python backend found.
 
 c1 to c5 and r1 to r5 constants are implemented as class attribute.
 The class must be instantiated with the OP parameter.
@@ -190,7 +189,7 @@ b'\xdd\xf1\xc7w\x11x\xce\xdb'
 ```
 
 TOPc handling is similar as in Milenage and can be set explicitly through the set\_topc() method
-before calling f1() and f2345() methods several times, then finally unset with unset_topc() method.
+before calling f1() and f2345() methods several times, then finally unset with unset\_topc() method.
  
 
 ### Kasumi-based encryption and integrity protection algorithms
@@ -337,14 +336,14 @@ $ python3 -m test.test_TUAK
 
 ## Content
 The library is structured into 3 main parts:
-- C_alg: provides C source codes for comp128, KeccakP-1600, Kasumi, SNOW 3G and ZUC
-- C_py: provides C source files wrapping those algorithms with CPython (for both 
+- C\_alg: provides C source codes for comp128, KeccakP-1600, Kasumi, SNOW 3G and ZUC
+- C\_py: provides C source files wrapping those algorithms with CPython (for both 
   Python2 and Python3)
 - CryptoMobile: provides Python source files.
 
 And two additional folders:
 - test: provides files with test vectors.
-- _ctypes: provides the old CM module which uses ctypes binding to the C files
+- \_ctypes: provides the old CM module which uses ctypes binding to the C files
   compiled as shared object.
 
 Within the CryptoMobile directory, we have the following modules:
@@ -352,7 +351,7 @@ Within the CryptoMobile directory, we have the following modules:
 - AES.py: provides support for several AES Python backend
 - CMAC.py: provides a CMAC class which implement the CMAC mode of operation
 - CM.py: the main module providing classes KASUMI, SNOW3G, ZUC (making use of the
-  wrappers in C_py) and AES_3GPP (making use of the AES backend),
+  wrappers in C\_py) and AES\_3GPP (making use of the AES backend),
   and functions UEA1, UIA1, UEA2, UIA2, EEA1, EIA1, EEA2, EIA2, EEA3 and EIA3. 
 - Milenage.py: provides the Milenage algorithm and conversion functions to be used
   for keys and authentication vectors conversion.
