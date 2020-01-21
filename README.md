@@ -16,15 +16,25 @@ and [ETSI](http://www.etsi.org/about/what-we-do/security-algorithms-and-codes/ce
 ## Installation
 The standard installation process is to use the CPython build environment to compile
 C files and install them together with the Python wrappers. The Milenage and EEA2/EIA2
-algorithms moreover require the [Pycrypto](https://github.com/dlitz/pycrypto) library 
-for supporting AES.
+algorithms moreover require one of the following Python cryptographic library to support
+AES:
+- [pycrypto](https://github.com/dlitz/pycrypto) or
+- [pycryprodomex](https://www.pycryptodome.org/en/latest/src/installation.html) or
+- [cryptography](https://cryptography.io/en/latest/)
 
-An installation script is available.
-It installs the library within your Python package directory:
+
+This library supports both Python 2 and 3 versions.
+An installation script is available: it installs the library within your Python 
+package directory:
 
 ```
 python setup.py install
 ```
+or
+```
+sudo python setup.py install
+```
+to make a system-wide install
 
 It is also possible to test the library before installing it:
 
@@ -40,13 +50,13 @@ python setup.py build
 
 For generic info on building C extensions on Windows, see the 
 [Python wiki](https://wiki.python.org/moin/WindowsCompilers).
-When building on a Windows system using the MSVC compiler, the .c files will be
-renamed to .cc by the install script in order to get it compiled correctly by the
-MSVC compiler.
+When building on a Windows system using the MSVC compiler, the .c files will be automatically
+renamed to .cc by the install script in order to get it compiled correctly by the MSVC compiler.
 
 ### Installing the ctypes version instead of the CPython wrappers
-There is still the possibility to install by hand the previous version using Python-only
-_ctypes_ source files. A *CM_ctypes.py* is available in the _ctypes directory.
+There is still the possibility to install manually the historical version of tle library which uses
+Python-only _ctypes_ source files. A *CM_ctypes.py* is available in the _ctypes directory 
+for this purpose.
     
 TODO
 
@@ -54,8 +64,8 @@ TODO
 Most of the classes and methods have docstrings. Just read them to get information
 on how to use and call them.
 Warning: most of the C reference implementations are using global or static variables,
-which are making them not thread-safe. Using them through Python is OK thanks to the
-GIL, but beware in case you want to use them directly from C.
+which are making them not thread-safe. Using them through Python is however OK thanks 
+to the GIL, but beware in case you want to use them directly from C.
 
 ### CMAC mode of operation
 This is the CBC-MAC mode as defined by NIST. It works with any block cipher primitive,
@@ -66,9 +76,9 @@ Here is an example on how to use it with AES:
 >>> from CryptoMobile.CMAC import CMAC
 >>> help(CMAC)
 [...]
->>> from Crypto.Cipher import AES
+>>> from CryptoMobile.AES import AES_ECB
 >>> key = 16*b'A'
->>> cmac = CMAC(key, AES, Tlen=48)
+>>> cmac = CMAC(key, AES_ECB, Tlen=48)
 >>> cmac.cmac(200*b'test')
 b'\xf7\xad\x89-j\n'
 >>> cmac.cmac(200*b'test', (200*8)-2) # this is to not compute the MAC over the last 2 bits of the input
@@ -141,19 +151,47 @@ b'\xf7~|\x95\x9e\xbf\xfb?'
 >>> Mil.unset_opc()
 ```
 
-Some conversion functions are also provided in the Milenage module: conv_C2, conv_C3,
-conv_C4 and conv_C5 for 2G / 3G authentication vectors conversion ; conv_A2, conv_A3, 
-conv_A4 and conv_A7 for LTE key derivation and 3G / LTE authentication vectors conversion.
+Some conversion functions are also provided in the Milenage module:
+- conv\_C2, conv\_C3, conv\_C4 and conv\_C5 for 2G / 3G authentication vectors conversion
+- conv\_A2, conv\_A3, conv\_A4 and conv\_A7 for LTE key derivation and 3G / LTE authentication 
+   vectors conversion
 
 ### TUAK
 This is the Python wrapper over the TUAK algorithm. The mode of operation is written
-is Python, and makes use of the KeccakP-1600 permutation function. The C code for this
+in Python, and makes use of the KeccakP-1600 permutation function. The C code for this
 permutation function has been taken from the 3GPP TS 35.231 specification.
+
+TUAK algorithm is to be used similarly as Milenage. TOP (TUAK-OP) is replacing OP
+and TOPc is replacing OPc. TOP, TOPc are 32 bytes, secret keys K can be 16 or 32 bytes.
+Length of outputs produced (MAC, RES, CK and IK) can be configured through the following
+class attributes too: LEN\_CK, LEN\_IK, LEN\_MAC, LEN\_RES.
+Moreover, the algorithm can be personalized with 2 parameters, implemented as class 
+attributes: ALGONAME and KeccakIterations. On the other side, there is no such constants 
+as c1..c5 and r1..r5, as in Milenage.
 
 Here is an example on how to use it:
 ```
-TODO
+>>> from CryptoMobile.TUAK import TUAK
+>>> help(TUAK)
+[...]
+>>> TUAK.ALGONAME
+b'TUAK1.0'
+>>> TUAK.KeccakIterations
+1
+>>> TOP = 32*b'F'
+>>> Tuak = TUAK(TOP)
+>>> key, rand = 32*b'A', 16*b'B'
+>>> help(Tuak.f1)
+[...]
+>>> Tuak.f1(key, rand, SQN=b'\0\0\0\0\x12\x34', AMF=b'\x80\0')
+b'\xdd\xf1\xc7w\x11x\xce\xdb'
+>>> Tuak.f2345(key, rand)
+(b'}/\xdc\xd4\xcb(qG', b'\xa8\x1dF\x84\x80\xac\t\xab\xe4\xa3\xf6\xe1\x8b\x9b7\xfe', b'g~=\xaf1\xfcy\x9b\x92\xc6\xd2M\xfa\xd0\xed\t', b'\x83\x1e\xcbp\xa6"')
 ```
+
+TOPc handling is similar as in Milenage and can be set explicitly through the set\_topc() method
+before calling f1() and f2345() methods several times, then finally unset with unset_topc() method.
+ 
 
 ### Kasumi-based encryption and integrity protection algorithms
 This is a Python wrapper around the reference C code of Kasumi and its mode of operation
@@ -291,6 +329,8 @@ You can also run some performance test by hand:
 ```
 $ python3 -m test.test_CM
 1000 full testsets in 7.246 seconds
+$ python3 -m test.test_Milenage
+1000 full testsets in 2.432 seconds
 $ python3 -m test.test_TUAK
 10000 full testsets in 2.322 seconds
 ```
@@ -307,11 +347,12 @@ And two additional folders:
 - _ctypes: provides the old CM module which uses ctypes binding to the C files
   compiled as shared object.
 
-Within the CryptoMobile directory, we have to following modules:
+Within the CryptoMobile directory, we have the following modules:
 - utils.py: provides common routine (eg log() and exception) for the library
+- AES.py: provides support for several AES Python backend
 - CMAC.py: provides a CMAC class which implement the CMAC mode of operation
 - CM.py: the main module providing classes KASUMI, SNOW3G, ZUC (making use of the
-  wrappers in C_py) and AES_3GPP (making use of the pycrypto AES implementation),
+  wrappers in C_py) and AES_3GPP (making use of the AES backend),
   and functions UEA1, UIA1, UEA2, UIA2, EEA1, EIA1, EEA2, EIA2, EEA3 and EIA3. 
 - Milenage.py: provides the Milenage algorithm and conversion functions to be used
   for keys and authentication vectors conversion.
