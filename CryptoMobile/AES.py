@@ -26,16 +26,16 @@
 # *--------------------------------------------------------
 #*/
 
-#__all__ = ['AES_CTR', 'AES_ECB']
+__all__ = ['AES_CTR', 'AES_ECB']
 
+from struct import pack, unpack
+
+from .utils import *
 
 # this is a wrapper around few Python cryptographic libraries that support AES
 # pycrypto (which seems unmaintained since 2014 / 2015)
 # pycryptodome, which is a fork of pycrypto
 # cryptography, which is a wrapper around openssl
-
-
-from struct import pack, unpack
 
 
 # try to load pycrypto
@@ -49,7 +49,6 @@ else:
 
 # try to load pycryptodome
 try:
-    #raise ImportError
     from Cryptodome.Cipher import AES as AES_pycryptodome
 except ImportError:
     _with_pycryptodome = False
@@ -69,9 +68,9 @@ else:
 
 
 # backend disablement
-#_with_pycrypto = False
-#_with_pycryptodome = False
-#_with_cryptography = False
+#_with_pycrypto      = False
+#_with_pycryptodome  = False
+#_with_cryptography  = False
 
 
 #------------------------------------------------------------------------------#
@@ -129,25 +128,34 @@ class AES_CTR_pycrypto(object):
     
     block_size = 16
     
-    def __init__(self, key, nonce):
+    def __init__(self, key, nonce, cnt=0):
         """initialize AES in ECB mode with the given key and nonce buffer
         
         key  : 16 bytes buffer
         nonce: 8 most significant bytes buffer of the counter initial value
                counter will be incremented starting at 0
+        cnt  : uint64, 8 least significant bytes value of the counter
+               default is 0
         """
         self.cnt_hi = nonce
-        self.cnt_lo = 0
-        self.aes = AES_pycrypto.new(key, AES_pycrypto.MODE_CTR, counter=self.__cnt)
+        self.cnt_lo = cnt
+        self.aes = AES_pycrypto.new(
+            key,
+            AES_pycrypto.MODE_CTR,
+            counter=self.__cnt)
     
     def __cnt(self):
         cnt = self.cnt_hi + pack('>Q', self.cnt_lo)
         self.cnt_lo += 1
+        if self.cnt_lo == MAX_UINT64:
+            self.cnt_lo = 0
         return cnt
     
     def encrypt(self, data):
-        """encrypt data with the key set at initialization"""
+        """encrypt / decrypt data with the key and IV set at initialization"""
         return self.aes.encrypt(data)
+    
+    decrypt = encrypt
 
 
 class AES_CTR_pycryptodome(object):
@@ -155,18 +163,26 @@ class AES_CTR_pycryptodome(object):
     
     block_size = 16
     
-    def __init__(self, key, nonce):
+    def __init__(self, key, nonce, cnt=0):
         """initialize AES in ECB mode with the given key and nonce buffer
         
         key  : 16 bytes buffer
         nonce: 8 most significant bytes buffer of the counter initial value
                counter will be incremented starting at 0
+        cnt  : uint64, 8 least significant bytes value of the counter
+               default is 0
         """
-        self.aes = AES_pycryptodome.new(key, AES_pycryptodome.MODE_CTR, nonce=nonce)
+        self.aes = AES_pycryptodome.new(
+            key,
+            AES_pycryptodome.MODE_CTR,
+            nonce=nonce,
+            initial_value=cnt)
     
     def encrypt(self, data):
-        """encrypt data with the key set at initialization"""
+        """encrypt / decrypt data with the key and IV set at initialization"""
         return self.aes.encrypt(data)
+    
+    decrypt = encrypt
 
 
 class AES_CTR_cryptography(object):
@@ -174,31 +190,38 @@ class AES_CTR_cryptography(object):
     
     block_size = 16
     
-    def __init__(self, key, nonce):
+    def __init__(self, key, nonce, cnt=0):
         """initialize AES in ECB mode with the given key and nonce buffer
         
         key  : 16 bytes buffer
         nonce: 8 most significant bytes buffer of the counter initial value
                counter will be incremented starting at 0
+        cnt  : uint64, 8 least significant bytes value of the counter
+               default is 0
         """
-        self.aes = Cipher(algorithms.AES(key), modes.CTR(nonce+8*b'\0'), backend=_backend).encryptor()
+        self.aes = Cipher(
+            algorithms.AES(key),
+            modes.CTR(nonce + pack('>Q', cnt)),
+            backend=_backend).encryptor()
     
     def encrypt(self, data):
-        """encrypt data with the key set at initialization"""
+        """encrypt / decrypt data with the key and IV set at initialization"""
         return self.aes.update(data)
+    
+    decrypt = encrypt
 
 
 #------------------------------------------------------------------------------#
 # AES backend selection
 #------------------------------------------------------------------------------#
 
-if _with_pycryptodome:
-    AES_ECB = AES_ECB_pycryptodome
-    AES_CTR = AES_CTR_pycryptodome
-
-elif _with_pycrypto:
-    AES_CTR = AES_CTR_pycrypto
+if _with_pycrypto:
     AES_ECB = AES_ECB_pycrypto
+    AES_CTR = AES_CTR_pycrypto
+
+elif _with_pycryptodome:
+    AES_CTR = AES_CTR_pycryptodome
+    AES_ECB = AES_ECB_pycryptodome
 
 elif _with_cryptography:
     AES_CTR = AES_CTR_cryptography
@@ -207,3 +230,4 @@ elif _with_cryptography:
 else:
     raise(ImportError('missing AES backend: requires cryptography, pycryptodome or pycrypto'))
 
+#print('AES backend: %s, %s' % (AES_ECB.__name__, AES_CTR.__name__))
