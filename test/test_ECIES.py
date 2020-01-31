@@ -33,6 +33,7 @@
 # as defined in 3GPP TS 33.501, annex C
 #######################################################
 
+from time     import time
 from binascii import unhexlify
 
 from cryptography.hazmat.primitives.asymmetric.x25519   import X25519PrivateKey

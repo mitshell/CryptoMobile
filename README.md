@@ -20,8 +20,7 @@ algorithms moreover require one of the following Python cryptographic library to
 AES:
 - [pycrypto](https://github.com/dlitz/pycrypto) or
 - [pycryprodomex](https://www.pycryptodome.org/en/latest/src/installation.html) or
-- [cryptography](https://cryptography.io/en/latest/)
-The ECIES algorithm require the cryptography library.
+- [cryptography](https://cryptography.io/en/latest/) (the ECIES module requires it)
 
 
 This library supports both Python 2 and 3 versions.
@@ -377,12 +376,14 @@ By running the setup test (see installation), test vectors will all be run.
 You can also run some performance test by hand:
 
 ```
-$ python3 -m test.test_CM
-1000 full testsets in 7.246 seconds
-$ python3 -m test.test_Milenage
-1000 full testsets in 2.432 seconds
-$ python3 -m test.test_TUAK
-10000 full testsets in 2.322 seconds
+$ python test/test_CM.py
+1000 full testsets in 7.393 seconds
+$ python test/test_Milenage.py
+1000 full testsets in 1.494 seconds
+$ python test/test_TUAK.py
+10000 full testsets in 2.215 seconds
+$ python test/test_ECIES.py
+1000 full testsets in 2.202 seconds
 ```
 
 ## Content
@@ -412,3 +413,5 @@ Within the CryptoMobile directory, we have the following modules:
 - ETSI / SAGE for providing public cryptographic specifications, together with
   reference C source code
 - FreeRADIUS, Hacking projects, Sylvain Munaut, for the comp128.c source code
+- Developers and maintainers of pycrypto, pycryptodome and cryptography Python libraries 
+
