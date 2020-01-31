@@ -3,7 +3,7 @@
 ## About
 This toolkit implements python wrappers around 3G and LTE encryption and 
 integrity protection algorithms, COMP128, Milenage and TUAK authentication 
-algorithms.
+algorithms, and ECIES identity protection scheme.
 
 ## Disclaimer
 This is delivered for study only: beware that cryptographic material, 
@@ -51,6 +51,8 @@ For generic info on building C extensions on Windows, see the
 [Python wiki](https://wiki.python.org/moin/WindowsCompilers).
 When building on a Windows system using the MSVC compiler, the .c files will be automatically
 renamed to .cc by the install script in order to get them compiled correctly by the MSVC compiler.
+
+To be noted also that the library builds and runs fine with pypy3.
 
 ### Installing the ctypes version instead of the CPython wrappers
 There is still the possibility to install manually the historical version of the library which uses
