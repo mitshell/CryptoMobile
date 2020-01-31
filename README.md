@@ -21,6 +21,7 @@ AES:
 - [pycrypto](https://github.com/dlitz/pycrypto) or
 - [pycryprodomex](https://www.pycryptodome.org/en/latest/src/installation.html) or
 - [cryptography](https://cryptography.io/en/latest/)
+The ECIES algorithm require the cryptography library.
 
 
 This library supports both Python 2 and 3 versions.
@@ -53,7 +54,7 @@ When building on a Windows system using the MSVC compiler, the .c files will be 
 renamed to .cc by the install script in order to get them compiled correctly by the MSVC compiler.
 
 ### Installing the ctypes version instead of the CPython wrappers
-There is still the possibility to install manually the historical version of tle library which uses
+There is still the possibility to install manually the historical version of the library which uses
 Python-only _ctypes_ source files. A *CM_ctypes.py* is available in the \_ctypes directory 
 for this purpose.
 
@@ -319,6 +320,56 @@ b"MonPantalonS'EstDecousuMonPantalonS'EstDecousuMonPantalonS'EstDecousuMonPantal
 [...]
 >>> EIA3(key=16*b'\xc1', count=0x9955ab, bearer=0x16, dir=1, data=50*'MonPantalonS\'EstDecousu', bitlen=1149)
 b'\xa9\xc5h\x9e'
+```
+
+### ECIES module to support 5G SUPI / SUCI protection scheme
+The ECIES module, which relies on the python cryptography library, supports both
+ECIES profiles A and B, as described in 3GPP TS 33.501, annex C.
+
+At first a fixed Home-Network public / private keypair needs to be established. For this,
+the module EC can be used:
+```
+>>> from CryptoMobile.EC import *
+>>> ec = X25519() # using Curve25519 elliptic curve, i.e. profile A
+>>> ec.generate_keypair()
+>>> hn_pubkey = ec.get_pubkey()
+>>> hn_pubkey
+b"\xd9-\x98\xc5\x08\xa7M\x18\x80bi\x0b\xfa-\xd6[D\xe9'\xe4G|\x1d\xe1sRjXM[\xc7;"
+>>> hn_privkey = ec.get_privkey()
+>>> hn_privkey
+b'`y\x06o\xcf\x9c\xe0\xa4\x18\xb1ks\xe6\x97\xafB)\xeftt2\xcfX\xe4\x82\xaf/\x83[\xcc\xa7O'
+>>> ec = ECDH_SECP256R1() # using secp256r1 elliptic curve domain, i.e. profile B
+>>> ec.generate_keypair()
+>>> hn_pubkey = ec.get_pubkey()
+>>> hn_pubkey
+b'\x03u\xe82C\xa3.\x0e)\xaf\xd6\xad\n\x01\xafZ2\xca\xc9\x95G\\xG\x9d\xdczU\x91n\x1d%m'
+>>> hn_privkey = ec.get_privkey()
+>>> hn_privkey # the private key for secp256r1 is longer as it actually packages both private and public keys into a X.509 DER-encoded buffer
+b"0\x81\x87\x02\x01\x000\x13\x06\x07*\x86H\xce=[...]\x86'\x17"
+
+```
+
+In the principle, the public key of the home network needs to be setup in subscribers' SIM card, whereas
+the private key needs to be securely stored within the home network. Take care as the current version
+of the EC module does not provide options to manage those generated private keys password-protected when
+exported / imported.
+
+Then, when a subscriber wants to encrypt its fixed identity (e.g. the MSIN part of its IMSI), 
+to be then decrypted within the home network:
+```
+>>> ue_msin = b'\x102Tv\x98' # BCD-encoded value of the digit-string 0123456789
+>>> from CryptoMobile.ECIES import *
+>>> ue = ECIES_UE(profile='A')
+>>> ue.generate_sharedkey(hn_pubkey)
+>>> ue_pubkey, ue_ciphertext, ue_mac = ue.protect(ue_msin)
+>>> ue_pubkey, ue_ciphertext, ue_mac
+(b'\xe1\x1dBR\x8e\xcbd\x05\x94J\xf2ka\xee^\xaa\x96`\x87X\xe3\x96R\xd8w\xcb\xda\x0e}\xab\x9f\x01',
+ b'\x93I\x95?8',
+ b'\xbc\x91\xe1\x0cy\xe2\xf5\xa6')
+>>> hn = ECIES_HN(hn_privkey, profile='A')
+>>> hn_msin = hn.unprotect(ue_pubkey, ue_ciphertext, ue_mac)
+>>> hn_msin == ue_msin
+True
 ```
 
 ### running TUAK, UMTS and LTE algorithms test vectors
