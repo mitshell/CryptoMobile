@@ -408,6 +408,8 @@ Within the CryptoMobile directory, we have the following modules:
 - Milenage.py: provides the Milenage algorithm and conversion functions to be used
   for keys and authentication vectors conversion.
 - TUAK.py: provides the TUAK algorithm.
+- EC.py: provides both Curve25519 and secp256r1 elliptic curve modules for key exchange
+- ECIES.py: provides ECIES processing for 5G SUPI / SUCI protection scheme
 
 ## Credits
 - ETSI / SAGE for providing public cryptographic specifications, together with
