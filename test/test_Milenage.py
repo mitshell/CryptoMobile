@@ -46,13 +46,6 @@ OPnull = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 # Milenage f1, f1*, f2, f3, f4, f5 and f5*: testsets from 3GPP TS 35.207, section 4, 5 and 6
 ###
 
-'''
-f2: RES
-f3: CK
-f4: IK
-f5: AK
-'''
-
 def milenage_testset_1():
     K       = b'F[\\\xe8\xb1\x99\xb4\x9f\xaa_\n.\xe28\xa6\xbc'
     RAND    = b'#U<\xbe\x967\xa8\x9d!\x8a\xe6M\xaeG\xbf5'
@@ -132,12 +125,15 @@ def milenage_testset_6():
     b'?\x8cu\x87\xfe\x8eK#:\xf6v\xae\xde0\xba;', b'\xa7Fl\xc1\xe6\xb2\xa13}I\xd3\xb6n\x95\xd7\xb4', b'E\xb0\xf6\x9a\xb0l') and \
     Milenage(OP).f5star(K, RAND) == Milenage(OPnull).f5star(K, RAND, OP) == b'\x1fS\xcd+\x11\x13'
 
+
 def milenage_testsets():
     return milenage_testset_1() and milenage_testset_2() and milenage_testset_3() and\
     milenage_testset_4() and milenage_testset_5() and milenage_testset_6()
 
+
 def testall():
     return milenage_testsets()
+
 
 def testperf():
     a = None
@@ -146,8 +142,10 @@ def testperf():
         a = testall()
     print('1000 full testsets in %.3f seconds' % (time()-T0, ))
 
+
 def test_Milenage():
     assert( testall() )
+
 
 if __name__ == '__main__':
     testperf()

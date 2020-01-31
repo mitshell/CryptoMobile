@@ -289,8 +289,10 @@ def tuak_testsets_7():
         tuak_testset_73() and tuak_testset_74() and \
         tuak_testset_75() and tuak_testset_76()
 
+
 def testall():
     return keccak_testsets() and tuak_testsets_6() and tuak_testsets_7()
+
 
 def testperf():
     a = None
@@ -299,8 +301,10 @@ def testperf():
         a = testall()
     print('10000 full testsets in %.3f seconds' % (time()-T0, ))
 
+
 def test_TUAK():
     assert( testall() )
+
 
 if __name__ == '__main__':
     testperf()

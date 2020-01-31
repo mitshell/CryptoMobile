@@ -26,6 +26,6 @@
 # *--------------------------------------------------------
 #*/
 #
-__all__ = ['test_CM', 'test_Milenage', 'test_TUAK', 'test_CryptoMobile']
+__all__ = ['test_CM', 'test_Milenage', 'test_TUAK', 'test_ECIES', 'test_CryptoMobile']
 __version__ = '0.3'
 
