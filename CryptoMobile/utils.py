@@ -40,13 +40,21 @@ MAX_UINT64 = 1<<64
 
 
 if py_vers > 2:
+    
     def xor_buf(b1, b2):
         return bytes([b1[i]^b2[i] for i in range(0, min(len(b1), len(b2)))])
     
+    def int_from_bytes(b):
+        return int.from_bytes(b, 'big')
+    
 else:
+    
     def xor_buf(b1, b2):
         b1, b2 = bytearray(b1), bytearray(b2)
         return b''.join([chr(b1[i]^b2[i]) for i in range(0, min(len(b1), len(b2)))])
+
+    def int_from_bytes(b):
+        return reduce(lambda x, y: (x<<8) + y, map(ord, b))
 
 
 # CryptoMobile-wide Exception handler
