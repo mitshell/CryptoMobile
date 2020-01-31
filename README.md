@@ -371,7 +371,7 @@ to be then decrypted within the home network:
 True
 ```
 
-### running TUAK, UMTS and LTE algorithms test vectors
+### running Milenage, TUAK, ECIES, UMTS and LTE algorithms test vectors
 By running the setup test (see installation), test vectors will all be run.
 You can also run some performance test by hand:
 
