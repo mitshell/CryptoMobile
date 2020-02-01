@@ -43,8 +43,15 @@
 
 from time import time
 
-#from CryptoMobile.CM_ctypes import KASUMI, SNOW3G, ZUC, AES_3GPP
-from CryptoMobile.CM import KASUMI, SNOW3G, ZUC, AES_3GPP
+from CryptoMobile.CM import KASUMI, SNOW3G, ZUC
+try:
+    from CryptoMobile.CM import EEA2
+except ImportError:
+    _with_aes = False
+else:
+    from CryptoMobile.CM import AES_3GPP
+    _with_aes = True
+
 
 ###
 # Kasumi, F8, F9: testsets from 3GPP TS 35.203 Rel.10
@@ -767,8 +774,13 @@ def aes_testsets():
             aes_EIA2_testset_5() & aes_EIA2_testset_6() & \
             aes_EIA2_testset_7() & aes_EIA2_testset_8()
 
+
 def testall():
-    return kasumi_testsets() & snow3g_testsets() & zuc_testsets() & aes_testsets()
+    if _with_aes:
+        return kasumi_testsets() & snow3g_testsets() & zuc_testsets() & aes_testsets()
+    else:
+        return kasumi_testsets() & snow3g_testsets() & zuc_testsets()
+
 
 def testperf():
     a = None
@@ -777,11 +789,10 @@ def testperf():
         a = testall()
     print('1000 full testsets in %.3f seconds' % (time()-T0, ))
 
+
 def test_CM():
     assert( testall() )
 
-def test_2():
-    assert()
 
 if __name__ == '__main__':
     testperf()

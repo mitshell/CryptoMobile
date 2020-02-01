@@ -3,7 +3,8 @@
 # * Software Name : CryptoMobile 
 # * Version : 0.3
 # *
-# * Copyright 2018. Benoit Michau. ANSSI. P1Sec.
+# * Copyright 2018. Benoit Michau. ANSSI.
+# * Copyright 2018. Benoit Michau. P1Sec.
 # *
 # * This program is free software: you can redistribute it and/or modify
 # * it under the terms of the GNU General Public License version 2 as published
@@ -27,11 +28,24 @@
 #*/
 
 import unittest
-from test.test_CM   import test_CM
-from test.test_TUAK import test_TUAK
+
+from test.test_CM       import test_CM
+from test.test_TUAK     import test_TUAK
+try:
+    from test.test_Milenage import test_Milenage
+except ImportError:
+    _with_aes = False
+else:
+    _with_aes = True
+    try:
+        from test.test_ECIES    import test_ECIES
+    except ImportError:
+        _with_ec = False
+    else:
+        _with_ec = True
 
 
-class TestPycrate(unittest.TestCase):
+class TestCryptoMobile(unittest.TestCase):
     
     # core objects
     def test_core(self):
@@ -39,6 +53,18 @@ class TestPycrate(unittest.TestCase):
         test_CM()
     
     def test_tuak(self):
-        print('[<>] testing CryptoMobile.CM.TUAK')
+        print('[<>] testing CryptoMobile.TUAK')
         test_TUAK()
+    
+    if _with_aes:
+        
+        def test_milenage(self):
+            print('[<>] testing CryptoMobile.Milenage')
+            test_Milenage()
+        
+        if _with_ec:
+            
+            def test_ecies(self):
+                print('[<>] testing CryptoMobile.ECIES')
+                test_ECIES()
 

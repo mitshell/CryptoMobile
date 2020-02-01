@@ -1,2 +1,2 @@
-__all__ = ['utils', 'CMAC', 'CM', 'Milenage', 'TUAK']
+__all__ = ['utils', 'AES', 'CMAC', 'CM', 'Milenage', 'TUAK']
 __version__ = '0.3'

@@ -7,7 +7,7 @@ Do not hesitate to clone it instead of this one.
 ## About
 This toolkit implements python wrappers around 3G and LTE encryption and 
 integrity protection algorithms, COMP128, Milenage and TUAK authentication 
-algorithms.
+algorithms, and ECIES identity protection scheme.
 
 ## Disclaimer
 This is delivered for study only: beware that cryptographic material, 
@@ -20,14 +20,23 @@ and [ETSI](http://www.etsi.org/about/what-we-do/security-algorithms-and-codes/ce
 ## Installation
 The standard installation process is to use the CPython build environment to compile
 C files and install them together with the Python wrappers. The Milenage and EEA2/EIA2
-algorithms moreover require the [Pycrypto](https://github.com/dlitz/pycrypto) library 
-for supporting AES.
+algorithms moreover require one of the following Python cryptographic library to support
+AES:
+- [pycrypto](https://github.com/dlitz/pycrypto) or
+- [pycryprodomex](https://www.pycryptodome.org/en/latest/src/installation.html) or
+- [cryptography](https://cryptography.io/en/latest/) (the ECIES module requires it)
 
-An installation script is available.
-It installs the library within your Python package directory:
+
+This library supports both Python 2 and 3 versions.
+An installation script is available: it installs the library within your Python 
+package directory:
 
 ```
 python setup.py install
+```
+or to make a system-wide install
+```
+sudo python setup.py install
 ```
 
 It is also possible to test the library before installing it:
@@ -44,22 +53,24 @@ python setup.py build
 
 For generic info on building C extensions on Windows, see the 
 [Python wiki](https://wiki.python.org/moin/WindowsCompilers).
-When building on a Windows system using the MSVC compiler, the .c files will be
-renamed to .cc by the install script in order to get it compiled correctly by the
-MSVC compiler.
+When building on a Windows system using the MSVC compiler, the .c files will be automatically
+renamed to .cc by the install script in order to get them compiled correctly by the MSVC compiler.
+
+To be noted also that the library builds and runs fine with pypy3.
 
 ### Installing the ctypes version instead of the CPython wrappers
-There is still the possibility to install by hand the previous version using Python-only
-_ctypes_ source files. A *CM_ctypes.py* is available in the _ctypes directory.
-    
-TODO
+There is still the possibility to install manually the historical version of the library which uses
+Python-only _ctypes_ source files. A *CM_ctypes.py* is available in the \_ctypes directory 
+for this purpose.
 
 ## Usage
 Most of the classes and methods have docstrings. Just read them to get information
 on how to use and call them.
+
+
 Warning: most of the C reference implementations are using global or static variables,
-which are making them not thread-safe. Using them through Python is OK thanks to the
-GIL, but beware in case you want to use them directly from C.
+which are making them not thread-safe. Using them through Python is however OK thanks 
+to the GIL, but beware in case you want to use them directly from C.
 
 ### CMAC mode of operation
 This is the CBC-MAC mode as defined by NIST. It works with any block cipher primitive,
@@ -70,9 +81,9 @@ Here is an example on how to use it with AES:
 >>> from CryptoMobile.CMAC import CMAC
 >>> help(CMAC)
 [...]
->>> from Crypto.Cipher import AES
+>>> from CryptoMobile.AES import AES_ECB
 >>> key = 16*b'A'
->>> cmac = CMAC(key, AES, Tlen=48)
+>>> cmac = CMAC(key, AES_ECB, Tlen=48)
 >>> cmac.cmac(200*b'test')
 b'\xf7\xad\x89-j\n'
 >>> cmac.cmac(200*b'test', (200*8)-2) # this is to not compute the MAC over the last 2 bits of the input
@@ -99,7 +110,7 @@ Here is an example on how to use it:
 
 ### Milenage
 This is Python wrapper over the Milenage algorithm. The mode of operation is written
-in Python, and makes use of the AES function from the pycrypto package.
+in Python, and makes use of the AES function from one of the AES Python backend found.
 
 c1 to c5 and r1 to r5 constants are implemented as class attribute.
 The class must be instantiated with the OP parameter.
@@ -145,19 +156,47 @@ b'\xf7~|\x95\x9e\xbf\xfb?'
 >>> Mil.unset_opc()
 ```
 
-Some conversion functions are also provided in the Milenage module: conv_C2, conv_C3,
-conv_C4 and conv_C5 for 2G / 3G authentication vectors conversion ; conv_A2, conv_A3, 
-conv_A4 and conv_A7 for LTE key derivation and 3G / LTE authentication vectors conversion.
+Some conversion functions are also provided in the Milenage module:
+- conv\_C2, conv\_C3, conv\_C4 and conv\_C5 for 2G / 3G authentication vectors conversion
+- conv\_A2, conv\_A3, conv\_A4 and conv\_A7 for LTE key derivation and 3G / LTE authentication 
+   vectors conversion
 
 ### TUAK
 This is the Python wrapper over the TUAK algorithm. The mode of operation is written
-is Python, and makes use of the KeccakP-1600 permutation function. The C code for this
+in Python, and makes use of the KeccakP-1600 permutation function. The C code for this
 permutation function has been taken from the 3GPP TS 35.231 specification.
+
+TUAK algorithm is to be used similarly as Milenage. TOP (TUAK-OP) is replacing OP
+and TOPc is replacing OPc. TOP, TOPc are 32 bytes, secret keys K can be 16 or 32 bytes.
+Length of outputs produced (MAC, RES, CK and IK) can be configured through the following
+class attributes too: LEN\_CK, LEN\_IK, LEN\_MAC, LEN\_RES.
+Moreover, the algorithm can be personalized with 2 parameters, implemented as class 
+attributes: ALGONAME and KeccakIterations. On the other side, there is no such constants 
+as c1..c5 and r1..r5, as in Milenage.
 
 Here is an example on how to use it:
 ```
-TODO
+>>> from CryptoMobile.TUAK import TUAK
+>>> help(TUAK)
+[...]
+>>> TUAK.ALGONAME
+b'TUAK1.0'
+>>> TUAK.KeccakIterations
+1
+>>> TOP = 32*b'F'
+>>> Tuak = TUAK(TOP)
+>>> key, rand = 32*b'A', 16*b'B'
+>>> help(Tuak.f1)
+[...]
+>>> Tuak.f1(key, rand, SQN=b'\0\0\0\0\x12\x34', AMF=b'\x80\0')
+b'\xdd\xf1\xc7w\x11x\xce\xdb'
+>>> Tuak.f2345(key, rand)
+(b'}/\xdc\xd4\xcb(qG', b'\xa8\x1dF\x84\x80\xac\t\xab\xe4\xa3\xf6\xe1\x8b\x9b7\xfe', b'g~=\xaf1\xfcy\x9b\x92\xc6\xd2M\xfa\xd0\xed\t', b'\x83\x1e\xcbp\xa6"')
 ```
+
+TOPc handling is similar as in Milenage and can be set explicitly through the set\_topc() method
+before calling f1() and f2345() methods several times, then finally unset with unset\_topc() method.
+ 
 
 ### Kasumi-based encryption and integrity protection algorithms
 This is a Python wrapper around the reference C code of Kasumi and its mode of operation
@@ -288,40 +327,99 @@ b"MonPantalonS'EstDecousuMonPantalonS'EstDecousuMonPantalonS'EstDecousuMonPantal
 b'\xa9\xc5h\x9e'
 ```
 
-### running TUAK, UMTS and LTE algorithms test vectors
+### ECIES module to support 5G SUPI / SUCI protection scheme
+The ECIES module, which relies on the python cryptography library, supports both
+ECIES profiles A and B, as described in 3GPP TS 33.501, annex C.
+
+At first a fixed Home-Network public / private keypair needs to be established. For this,
+the module EC can be used:
+```
+>>> from CryptoMobile.EC import *
+>>> ec = X25519() # using Curve25519 elliptic curve, i.e. profile A
+>>> ec.generate_keypair()
+>>> hn_pubkey = ec.get_pubkey()
+>>> hn_pubkey
+b"\xd9-\x98\xc5\x08\xa7M\x18\x80bi\x0b\xfa-\xd6[D\xe9'\xe4G|\x1d\xe1sRjXM[\xc7;"
+>>> hn_privkey = ec.get_privkey()
+>>> hn_privkey
+b'`y\x06o\xcf\x9c\xe0\xa4\x18\xb1ks\xe6\x97\xafB)\xeftt2\xcfX\xe4\x82\xaf/\x83[\xcc\xa7O'
+>>> ec = ECDH_SECP256R1() # using secp256r1 elliptic curve domain, i.e. profile B
+>>> ec.generate_keypair()
+>>> hn_pubkey = ec.get_pubkey()
+>>> hn_pubkey
+b'\x03u\xe82C\xa3.\x0e)\xaf\xd6\xad\n\x01\xafZ2\xca\xc9\x95G\\xG\x9d\xdczU\x91n\x1d%m'
+>>> hn_privkey = ec.get_privkey()
+>>> hn_privkey # the private key for secp256r1 is longer as it actually packages both private and public keys into a X.509 DER-encoded buffer
+b"0\x81\x87\x02\x01\x000\x13\x06\x07*\x86H\xce=[...]\x86'\x17"
+
+```
+
+In the principle, the public key of the home network needs to be setup in subscribers' SIM card, whereas
+the private key needs to be securely stored within the home network. Take care as the current version
+of the EC module does not provide options to manage those generated private keys password-protected when
+exported / imported.
+
+Then, when a subscriber wants to encrypt its fixed identity (e.g. the MSIN part of its IMSI), 
+to be then decrypted within the home network:
+```
+>>> ue_msin = b'\x102Tv\x98' # BCD-encoded value of the digit-string 0123456789
+>>> from CryptoMobile.ECIES import *
+>>> ue = ECIES_UE(profile='A')
+>>> ue.generate_sharedkey(hn_pubkey)
+>>> ue_pubkey, ue_ciphertext, ue_mac = ue.protect(ue_msin)
+>>> ue_pubkey, ue_ciphertext, ue_mac
+(b'\xe1\x1dBR\x8e\xcbd\x05\x94J\xf2ka\xee^\xaa\x96`\x87X\xe3\x96R\xd8w\xcb\xda\x0e}\xab\x9f\x01',
+ b'\x93I\x95?8',
+ b'\xbc\x91\xe1\x0cy\xe2\xf5\xa6')
+>>> hn = ECIES_HN(hn_privkey, profile='A')
+>>> hn_msin = hn.unprotect(ue_pubkey, ue_ciphertext, ue_mac)
+>>> hn_msin == ue_msin
+True
+```
+
+### running Milenage, TUAK, ECIES, UMTS and LTE algorithms test vectors
 By running the setup test (see installation), test vectors will all be run.
 You can also run some performance test by hand:
 
 ```
-$ python3 -m test.test_CM
-1000 full testsets in 7.246 seconds
-$ python3 -m test.test_TUAK
-10000 full testsets in 2.322 seconds
+$ python test/test_CM.py
+1000 full testsets in 7.393 seconds
+$ python test/test_Milenage.py
+1000 full testsets in 1.494 seconds
+$ python test/test_TUAK.py
+10000 full testsets in 2.215 seconds
+$ python test/test_ECIES.py
+1000 full testsets in 2.202 seconds
 ```
 
 ## Content
 The library is structured into 3 main parts:
-- C_alg: provides C source codes for comp128, KeccakP-1600, Kasumi, SNOW 3G and ZUC
-- C_py: provides C source files wrapping those algorithms with CPython (for both 
+- C\_alg: provides C source codes for comp128, KeccakP-1600, Kasumi, SNOW 3G and ZUC
+- C\_py: provides C source files wrapping those algorithms with CPython (for both 
   Python2 and Python3)
 - CryptoMobile: provides Python source files.
 
 And two additional folders:
 - test: provides files with test vectors.
-- _ctypes: provides the old CM module which uses ctypes binding to the C files
+- \_ctypes: provides the old CM module which uses ctypes binding to the C files
   compiled as shared object.
 
-Within the CryptoMobile directory, we have to following modules:
+Within the CryptoMobile directory, we have the following modules:
 - utils.py: provides common routine (eg log() and exception) for the library
+- AES.py: provides support for several AES Python backend
 - CMAC.py: provides a CMAC class which implement the CMAC mode of operation
 - CM.py: the main module providing classes KASUMI, SNOW3G, ZUC (making use of the
-  wrappers in C_py) and AES_3GPP (making use of the pycrypto AES implementation),
+  wrappers in C\_py) and AES\_3GPP (making use of the AES backend),
   and functions UEA1, UIA1, UEA2, UIA2, EEA1, EIA1, EEA2, EIA2, EEA3 and EIA3. 
 - Milenage.py: provides the Milenage algorithm and conversion functions to be used
   for keys and authentication vectors conversion.
 - TUAK.py: provides the TUAK algorithm.
+- EC.py: provides both Curve25519 and secp256r1 elliptic curve modules for key exchange
+- ECIES.py: provides ECIES processing for 5G SUPI / SUCI protection scheme
 
 ## Credits
 - ETSI / SAGE for providing public cryptographic specifications, together with
   reference C source code
 - FreeRADIUS, Hacking projects, Sylvain Munaut, for the comp128.c source code
+- Developers and maintainers of pycrypto, pycryptodome and cryptography Python libraries 
+

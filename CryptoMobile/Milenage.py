@@ -37,9 +37,9 @@
 import hmac
 from struct        import pack
 from hashlib       import sha256
-from Crypto.Cipher import AES
 #
 from .utils        import *
+from .AES          import AES_ECB
 
 __all__ = ['Milenage', 'KDF', 'make_OPc', 'xor_buf',
            'conv_C2', 'conv_C3', 'conv_C4', 'conv_C5',
@@ -53,7 +53,7 @@ def rot_buf(b, r):
 
 def make_OPc( K, OP ):
     """derive OP with K to produce OPc"""
-    return xor_buf( AES.new(K, AES.MODE_ECB).encrypt(OP), OP )
+    return xor_buf( AES_ECB(K).encrypt(OP), OP )
 
 def KDF( K, S ):
     """derive S with K according to 3GPP Key Derivation Function defined in TS 33.220"""
@@ -120,15 +120,17 @@ class Milenage:
         else:
             OPc = make_OPc(K, self.OP)
         #
-        inp = SQN + AMF + SQN + AMF
-        K_OPc_RAND = AES.new(K, AES.MODE_ECB).encrypt(xor_buf(RAND, OPc))
+        inp    = SQN + AMF + SQN + AMF
+        cipher = AES_ECB(K)
+        K_OPc_RAND = cipher.encrypt(xor_buf(RAND, OPc))
         #
-        out1 = xor_buf(AES.new(K, AES.MODE_ECB).encrypt(
+        out1 = xor_buf(cipher.encrypt(
                        xor_buf(xor_buf(rot_buf(xor_buf(inp, OPc),
                                                self.r1),
                                        self.c1),
                                K_OPc_RAND)),
                        OPc)
+        
         return out1[0:8]
     
     def f1star(self, K, RAND, SQN, AMF, OP=None):
@@ -145,10 +147,11 @@ class Milenage:
         else:
             OPc = make_OPc(K, self.OP)
         #
-        inp = SQN + AMF + SQN + AMF
-        K_OPc_RAND = AES.new(K, AES.MODE_ECB).encrypt(xor_buf(RAND, OPc))
+        inp    = SQN + AMF + SQN + AMF
+        cipher = AES_ECB(K)
+        K_OPc_RAND = cipher.encrypt(xor_buf(RAND, OPc))
         #
-        out1 = xor_buf(AES.new(K, AES.MODE_ECB).encrypt(
+        out1 = xor_buf(cipher.encrypt(
                        xor_buf(xor_buf(rot_buf(xor_buf(inp, OPc),
                                                self.r1),
                                        self.c1),
@@ -170,24 +173,25 @@ class Milenage:
         else:
             OPc = make_OPc(K, self.OP)
         #
-        K_OPc_RAND_OPc = xor_buf(AES.new(K, AES.MODE_ECB).encrypt(
+        cipher = AES_ECB(K)
+        K_OPc_RAND_OPc = xor_buf(cipher.encrypt(
                                  xor_buf(OPc, RAND)),
                                  OPc)
         #
         out2 = xor_buf(OPc,
-                       AES.new(K, AES.MODE_ECB).encrypt(
+                       cipher.encrypt(
                        xor_buf(rot_buf(K_OPc_RAND_OPc,
                                        self.r2),
                                self.c2)))
         #
         out3 = xor_buf(OPc,
-                       AES.new(K, AES.MODE_ECB).encrypt(
+                       cipher.encrypt(
                        xor_buf(rot_buf(K_OPc_RAND_OPc,
                                        self.r3),
                                self.c3)))
         #
         out4 = xor_buf(OPc,
-                       AES.new(K, AES.MODE_ECB).encrypt(
+                       cipher.encrypt(
                        xor_buf(rot_buf(K_OPc_RAND_OPc,
                                        self.r4),
                                self.c4)))
@@ -208,12 +212,13 @@ class Milenage:
         else:
             OPc = make_OPc(K, self.OP)
         #
-        K_OPc_RAND_OPc = xor_buf(AES.new(K, AES.MODE_ECB).encrypt(
+        cipher = AES_ECB(K)
+        K_OPc_RAND_OPc = xor_buf(cipher.encrypt(
                                  xor_buf(OPc, RAND)),
                                  OPc)
         #
         out5 = xor_buf(OPc,
-                       AES.new(K, AES.MODE_ECB).encrypt(
+                       cipher.encrypt(
                        xor_buf(rot_buf(K_OPc_RAND_OPc,
                                        self.r5),
                                self.c5)))
