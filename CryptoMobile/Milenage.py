@@ -34,22 +34,62 @@
 # see 3GPP TS 35.205, 206 and 207
 #######################################################
 
+import sys
 import hmac
-from struct        import pack
+from struct        import pack, unpack
 from hashlib       import sha256
 #
 from .utils        import *
 from .AES          import AES_ECB
+
 
 __all__ = ['Milenage', 'KDF', 'make_OPc', 'xor_buf',
            'conv_C2', 'conv_C3', 'conv_C4', 'conv_C5',
            'conv_A2', 'conv_A3', 'conv_A4', 'conv_A7']
 
 
-def rot_buf(b, r):
-    """rotate buffer b by r bits, r must be an 8-bit multiple"""
-    r //= 8
-    return b[r:] + b[:r]
+if sys.version_info[0] > 2:
+    # python 3
+    def rot_buf(b, r):
+        """rotate buffer b by r bits
+        """
+        ro, rb = r>>3, r%8
+        # byte-aligned rotation
+        br = b[ro:] + b[:ro]
+        if rb:
+            # unaligned bit-rotation
+            c = [ ((br[i]<<rb) & 0xff) + (br[i+1]>>(8-rb)) for i in range(len(br)-1)]
+            c.append( ((br[-1]<<rb) & 0xff) + (br[0]>>(8-rb)) )
+            br = bytes(c)
+        return br
+        
+else:
+    # python 2
+    def rot_buf(b, r):
+        """rotate buffer b by r bits
+        """
+        ro, rb = r>>3, r%8
+        # byte-aligned rotation
+        br = b[ro:] + b[:ro]
+        if rb:
+            # unaligned bit-rotation
+            br = bytearray(br)
+            c = [ ((br[i]<<rb) & 0xff) + (br[i+1]>>(8-rb)) for i in range(len(br)-1)]
+            c.append( ((br[-1]<<rb) & 0xff) + (br[0]>>(8-rb)) )
+            br = bytes(bytearray(c))
+        return br
+
+def rot_buf16(b, r):
+    """rotate 16-bytes buffer b by r bits
+    """
+    ro, rb = r>>3, r%8
+    # byte 
+    br = b[ro:] + b[:ro]
+    if rb:
+        b0, b1 = unpack('>QQ', br)
+        br = pack('>QQ', ((b0<<rb) & 0xffffffffffffffff) + (b1>>(64-rb)),
+                         ((b1<<rb) & 0xffffffffffffffff) + (b0>>(64-rb)))
+    return br
 
 def make_OPc( K, OP ):
     """derive OP with K to produce OPc"""
@@ -83,11 +123,11 @@ class Milenage:
     c4 = 15 * b'\x00' + b'\x04' #  128 bits
     c5 = 15 * b'\x00' + b'\x08' #  128 bits
 
-    r1 = 0x40
-    r2 = 0x00
-    r3 = 0x20
-    r4 = 0x40
-    r5 = 0x60
+    r1 = 0x40 # uint8
+    r2 = 0x00 # uint8
+    r3 = 0x20 # uint8
+    r4 = 0x40 # uint8
+    r5 = 0x60 # uint8
     
     def __init__(self, OP):
         self.OP  = OP
@@ -125,8 +165,8 @@ class Milenage:
         K_OPc_RAND = cipher.encrypt(xor_buf(RAND, OPc))
         #
         out1 = xor_buf(cipher.encrypt(
-                       xor_buf(xor_buf(rot_buf(xor_buf(inp, OPc),
-                                               self.r1),
+                       xor_buf(xor_buf(rot_buf16(xor_buf(inp, OPc),
+                                                 self.r1),
                                        self.c1),
                                K_OPc_RAND)),
                        OPc)
@@ -152,8 +192,8 @@ class Milenage:
         K_OPc_RAND = cipher.encrypt(xor_buf(RAND, OPc))
         #
         out1 = xor_buf(cipher.encrypt(
-                       xor_buf(xor_buf(rot_buf(xor_buf(inp, OPc),
-                                               self.r1),
+                       xor_buf(xor_buf(rot_buf16(xor_buf(inp, OPc),
+                                                 self.r1),
                                        self.c1),
                                K_OPc_RAND)),
                        OPc)
@@ -180,20 +220,20 @@ class Milenage:
         #
         out2 = xor_buf(OPc,
                        cipher.encrypt(
-                       xor_buf(rot_buf(K_OPc_RAND_OPc,
-                                       self.r2),
+                       xor_buf(rot_buf16(K_OPc_RAND_OPc,
+                                         self.r2),
                                self.c2)))
         #
         out3 = xor_buf(OPc,
                        cipher.encrypt(
-                       xor_buf(rot_buf(K_OPc_RAND_OPc,
-                                       self.r3),
+                       xor_buf(rot_buf16(K_OPc_RAND_OPc,
+                                         self.r3),
                                self.c3)))
         #
         out4 = xor_buf(OPc,
                        cipher.encrypt(
-                       xor_buf(rot_buf(K_OPc_RAND_OPc,
-                                       self.r4),
+                       xor_buf(rot_buf16(K_OPc_RAND_OPc,
+                                         self.r4),
                                self.c4)))
         #
         return out2[8:16], out3, out4, out2[:6]
@@ -219,8 +259,8 @@ class Milenage:
         #
         out5 = xor_buf(OPc,
                        cipher.encrypt(
-                       xor_buf(rot_buf(K_OPc_RAND_OPc,
-                                       self.r5),
+                       xor_buf(rot_buf16(K_OPc_RAND_OPc,
+                                         self.r5),
                                self.c5)))
         #
         return out5[:6]
