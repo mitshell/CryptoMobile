@@ -345,9 +345,8 @@ b'`y\x06o\xcf\x9c\xe0\xa4\x18\xb1ks\xe6\x97\xafB)\xeftt2\xcfX\xe4\x82\xaf/\x83[\
 >>> hn_pubkey
 b'\x03u\xe82C\xa3.\x0e)\xaf\xd6\xad\n\x01\xafZ2\xca\xc9\x95G\\xG\x9d\xdczU\x91n\x1d%m'
 >>> hn_privkey = ec.get_privkey()
->>> hn_privkey # the private key for secp256r1 is longer as it actually packages both private and public keys into a X.509 DER-encoded buffer
+>>> hn_privkey # the private key for secp256r1 is longer as it is actually packed into a DER-encoded PKCS8 structure
 b"0\x81\x87\x02\x01\x000\x13\x06\x07*\x86H\xce=[...]\x86'\x17"
-
 ```
 
 In the principle, the public key of the home network needs to be setup in subscribers' SIM card, whereas
