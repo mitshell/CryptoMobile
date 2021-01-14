@@ -123,7 +123,7 @@ class TUAK:
         """return MAC_A [8, 16 or 32 bytes buffer] or None on error
         """
         if len(K) not in (16, 32) or len(RAND) != 16 or len(SQN) != 6 or len(AMF) != 2:
-            _log('ERR', 'TUAK.f1: invalid args')
+            log('ERR', 'TUAK.f1: invalid args')
             return None
         
         if self.LEN_MAC == 64:
@@ -174,7 +174,7 @@ class TUAK:
         """return MAC_S [8, 16 or 32 bytes buffer] or None on error
         """
         if len(K) not in (16, 32) or len(RAND) != 16 or len(SQN) != 6 or len(AMF) != 2:
-            _log('ERR', 'TUAK.f1star: invalid args')
+            log('ERR', 'TUAK.f1star: invalid args')
             return None
         
         if self.LEN_MAC == 64:
@@ -225,7 +225,7 @@ class TUAK:
         """return RES [4, 8, 16 or 32], CK [16 or 32], IK [16 or 32] and AK [6] bytes buffers or None on error
         """
         if len(K) not in (16, 32) or len(RAND) != 16:
-            _log('ERR', 'TUAK.f234: invalid args')
+            log('ERR', 'TUAK.f234: invalid args')
             return None
         
         if self.LEN_RES == 32:
@@ -289,7 +289,7 @@ class TUAK:
         """return AK [6 bytes buffer] or None on error
         """
         if len(K) not in (16, 32) or len(RAND) != 16:
-            _log('ERR', 'TUAK.f5star: invalid args')
+            log('ERR', 'TUAK.f5star: invalid args')
             return None
         
         INSTANCE = 0xc0

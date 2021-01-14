@@ -150,7 +150,7 @@ class Milenage:
         """return MAC_A [8 bytes buffer] or None on error
         """
         if len(K) != 16 or len(RAND) != 16 or len(SQN) != 6 or len(AMF) != 2:
-            _log('ERR', 'Milenage.f1: invalid args')
+            log('ERR', 'Milenage.f1: invalid args')
             return None
         #
         if self.OPc is not None:
@@ -177,7 +177,7 @@ class Milenage:
         """return MAC_S [8 bytes buffer] or None on error
         """
         if len(K) != 16 or len(RAND) != 16 or len(SQN) != 6 or len(AMF) != 2:
-            _log('ERR', 'Milenage.f1star: invalid args')
+            log('ERR', 'Milenage.f1star: invalid args')
             return None
         #
         if self.OPc is not None:
@@ -203,7 +203,7 @@ class Milenage:
         """return RES [8], CK [16], IK [16] and AK [6] bytes buffers or None on error
         """
         if len(K) != 16 or len(RAND) != 16:
-            _log('ERR', 'Milenage.f2345: invalid args')
+            log('ERR', 'Milenage.f2345: invalid args')
             return None
         #
         if self.OPc is not None:
@@ -242,7 +242,7 @@ class Milenage:
         """return AK [6 bytes buffer] or None on error
         """
         if len(K) != 16 or len(RAND) != 16:
-            _log('ERR', 'Milenage.f5star: invalid args')
+            log('ERR', 'Milenage.f5star: invalid args')
             return None
         #
         if self.OPc is not None:
@@ -285,7 +285,7 @@ def conv_C2(XRES):
     """
     len_xres = len(XRES)
     if len_xres < 4 or len_xres > 16:
-        _log('ERR', 'conv_C2: invalid args')
+        log('ERR', 'conv_C2: invalid args')
         return None
     # adapt XRES length
     if len_xres < 16:
@@ -304,7 +304,7 @@ def conv_C3(CK, IK):
     or None on error
     """
     if len(CK) != 16 or len(IK) != 16:
-        _log('ERR', 'conv_C3: invalid args')
+        log('ERR', 'conv_C3: invalid args')
         return None
     return xor_buf(xor_buf(xor_buf(CK[0:8], CK[8:16]),
                            IK[0:8]),
@@ -319,7 +319,7 @@ def conv_C4(Kc):
     or None on error
     """
     if len(Kc) != 8:
-        _log('ERR', 'conv_C4: invalid args')
+        log('ERR', 'conv_C4: invalid args')
         return None
     return Kc + Kc
 
@@ -332,7 +332,7 @@ def conv_C5(Kc):
     or None on error
     """
     if len(Kc) != 8:
-        _log('ERR', 'conv_C5: invalid args')
+        log('ERR', 'conv_C5: invalid args')
         return None
     XKc = xor_buf(Kc[:4], Kc[4:])
     return XKc + Kc + XKc
@@ -352,7 +352,7 @@ def conv_A2(CK, IK, sn_id, sqn_x_ak):
     or None on error
     """
     if len(CK) != 16 or len(IK) != 16 or len(sn_id) != 3 or len(sqn_x_ak) != 6:
-        _log('ERR', 'conv_A2: invalid args')
+        log('ERR', 'conv_A2: invalid args')
         return None
     return KDF(CK+IK, b'\x10' + sn_id + b'\0\x03' + sqn_x_ak + b'\0\x06')
 
@@ -366,7 +366,7 @@ def conv_A3(Kasme, ul_nas_cnt):
     or None on error
     """
     if len(Kasme) != 32 or not (0 <= ul_nas_cnt < 16777216):
-        _log('ERR', 'conv_A3: invalid args')
+        log('ERR', 'conv_A3: invalid args')
         return None
     return KDF(Kasme, b'\x11' + pack('>IH', ul_nas_cnt, 4))
 
@@ -380,7 +380,7 @@ def conv_A4(Kasme, SYNC):
     or None on error
     """
     if len(Kasme) != 32 or len(SYNC) != 32:
-        _log('ERR', 'conv_A4: invalid args')
+        log('ERR', 'conv_A4: invalid args')
         return None
     return KDF(Kasme, b'\x12' + SYNC + b'\0\x20')
 
@@ -395,7 +395,7 @@ def conv_A7(KEY, alg_dist=0, alg_id=0):
     or None on error
     """
     if len(KEY) != 32 or not (0 <= alg_dist < 256) or not (0 <= alg_id < 256):
-        _log('ERR', 'conv_A7: invalid args')
+        log('ERR', 'conv_A7: invalid args')
         return None
     return KDF(KEY, b'\x15' + pack('>BHBH', alg_dist, 1, alg_id, 1))
 
