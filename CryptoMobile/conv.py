@@ -168,7 +168,7 @@ def conv_501_A8(K, alg_type=0, alg_id=0):
         Algorithm identity [uint8]
     or None on error
     """
-    if len(K) != 32 or len(alg_type) != 1 or len(alg_id) != 1:
+    if len(K) != 32 or not 0 <= alg_type <= 6 or not 0 <= alg_id <= 15:
         log('ERR', 'conv_501_A8: invalid args')
         return None
     return KDF(K, b'\x69' + \
