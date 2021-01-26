@@ -68,3 +68,4 @@ class CMException(Exception):
 def log(level='DBG', msg=''):
     # log wrapper
     print('[%s] %s' % (level, msg))
+
