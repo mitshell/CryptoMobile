@@ -87,7 +87,7 @@ def conv_501_A2(CK, IK, sn_name, sqn_x_ak):
         raise(CMException('conv_501_A2: invalid args'))
     return KDF(CK + IK, b'\x6a' + \
                         sn_name + pack('>H', len(sn_name)) + \
-                        sqn_x_ak + b'\x06')
+                        sqn_x_ak + b'\x00\x06')
 
 
 def conv_501_A3(CK, IK, an_id, sqn_x_ak):
@@ -104,7 +104,7 @@ def conv_501_A3(CK, IK, an_id, sqn_x_ak):
         raise(CMException('conv_501_A3: invalid args'))
     buf = KDF(CK + IK, b'\x20' + \
                        an_id + pack('>H', len(an_id)) + \
-                       sqn_x_ak + b'\x06')
+                       sqn_x_ak + b'\x00\x06')
     return buf[:16], buf[16:]
 
 
