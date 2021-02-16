@@ -164,7 +164,7 @@ static PyObject* pykeccakp1600(PyObject* dummy, PyObject* args)
     
     if (data_in.len != 200)
     {
-        PyErr_SetString(PyExc_ValueError, "invalid args");
+        PyErr_SetString(PyExc_ValueError, "invalid arg, must be 200 bytes");
         return NULL;
     };
     
