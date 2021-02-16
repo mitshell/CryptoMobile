@@ -45,8 +45,8 @@ keccakp1600 = kec.pykeccakp1600
 
 from .utils        import *
 
-__all__ = ['TUAK', 'make_TOPc']
 
+__all__ = ['TUAK', 'make_TOPc']
 
 
 def make_TOPc( K, TOP ):

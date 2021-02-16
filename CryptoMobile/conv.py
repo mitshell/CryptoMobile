@@ -34,6 +34,14 @@ from .utils  import *
 
 __all__ = [
     'KDF',
+    'conv_102_C2',
+    'conv_102_C3',
+    'conv_102_C4',
+    'conv_102_C5',
+    'conv_401_A2',
+    'conv_401_A3',
+    'conv_401_A4',
+    'conv_401_A7',
     'conv_501_A2',
     'conv_501_A3',
     'conv_501_A4',
@@ -58,25 +66,170 @@ __all__ = [
     'conv_501_A21',
     'conv_501_A22',
     'conv_501_A23',
-    'test'
+    #'test'
     ]
 
 
-########################################################
+#------------------------------------------------------------------------------#
 # CryptoMobile python toolkit
 # conversion functions and Key Derivation Functions
-#######################################################
+#------------------------------------------------------------------------------#
 
-
+# 3G / 4G / 5G are using SHA2 for key derivation
 def KDF( K, S ):
     """derive S with K according to 3GPP Key Derivation Function defined in TS 33.220"""
     return hmac.new( K, S, sha256 ).digest()
 
 
-def conv_501_A2(CK, IK, sn_name, sqn_x_ak):
+#------------------------------------------------------------------------------#
+# 2G / 3G conversion functions
+#------------------------------------------------------------------------------#
+# see TS 33.102, 6.8.1.2 and annex C
+# for 3G subscribers attaching on a 2G network 
+# or 2G handsets attaching a 3G network
+
+# SRES (2G handset response) from XRES (3G USIM response)
+def conv_102_C2(XRES):
+    """C2 conversion function
+    
+    return 2G SRES [4 bytes buffer] from
+        3G XRES USIM output [4 to 16 bytes buffer]
+    or None on error
+    """
+    len_xres = len(XRES)
+    if len_xres < 4 or len_xres > 16:
+        log('ERR', 'conv_C2: invalid args')
+        return None
+    # adapt XRES length
+    if len_xres < 16:
+        XRES += (16-len_xres) * b'\0'
+    # xor the 4 parts of 4 bytes each
+    return xor_buf(xor_buf(xor_buf(XRES[:4], XRES[4:8]),
+                           XRES[8:12]),
+                   XRES[12:16])
+
+
+# Kc (2G handset ciphering key) from CK / IK (3G USIM keys)
+def conv_102_C3(CK, IK):
+    """C3 conversion function
+    
+    return 2G Kc [8 bytes buffer] from
+        3G CK and IK USIM output [16 bytes buffer each]
+    or None on error
+    """
+    if len(CK) != 16 or len(IK) != 16:
+        log('ERR', 'conv_C3: invalid args')
+        return None
+    return xor_buf(xor_buf(xor_buf(CK[0:8], CK[8:16]),
+                           IK[0:8]),
+                   IK[8:16])
+
+
+# CK (3G handset ciphering key) from Kc (2G SIM key)
+def conv_102_C4(Kc):
+    """C4 conversion function
+    
+    return 3G CK [16 bytes buffer] from
+        2G Kc SIM output [8 bytes buffer]
+    or None on error
+    """
+    if len(Kc) != 8:
+        log('ERR', 'conv_C4: invalid args')
+        return None
+    return Kc + Kc
+
+
+# IK (3G handset integrity-protection key) from Kc (2G SIM key)
+def conv_102_C5(Kc):
+    """C5 conversion function
+    
+    return 3G IK [16 bytes buffer] from
+        2G Kc SIM output [8 bytes buffer]
+    or None on error
+    """
+    if len(Kc) != 8:
+        log('ERR', 'conv_C5: invalid args')
+        return None
+    XKc = xor_buf(Kc[:4], Kc[4:])
+    return XKc + Kc + XKc
+
+
+#------------------------------------------------------------------------------#
+# 3G / LTE conversion functions
+#------------------------------------------------------------------------------#
+# see TS 33.401, annex A
+
+# Kasme (LTE master key) from CK, IK (3G USIM key)
+def conv_401_A2(CK, IK, sn_id, sqn_x_ak):
     """A2 conversion function
     
-    return K_AUSF [32 bytes buffer] from
+    return KASME [32 bytes buffer] from 
+        3G CK and IK USIM output [16 bytes buffer each],
+        SN_ID serving network identity [3 bytes buffer] and
+        SQN^AK [6 bytes buffer]
+    or None on error
+    """
+    if len(CK) != 16 or len(IK) != 16 or len(sn_id) != 3 or len(sqn_x_ak) != 6:
+        log('ERR', 'conv_A2: invalid args')
+        return None
+    return KDF(CK+IK, b'\x10' + sn_id + b'\0\x03' + sqn_x_ak + b'\0\x06')
+
+
+# KeNB (eNB AS master key) from Kasme and uplink NAS count
+def conv_401_A3(Kasme, ul_nas_cnt):
+    """A3 conversion function
+    
+    return KeNB [32 bytes buffer] from
+        Kasme [32 bytes buffer] and 
+        UL NAS count [uint24]
+    or None on error
+    """
+    if len(Kasme) != 32 or not (0 <= ul_nas_cnt < 16777216):
+        log('ERR', 'conv_A3: invalid args')
+        return None
+    return KDF(Kasme, b'\x11' + pack('>IH', ul_nas_cnt, 4))
+
+
+# NH (for generating KeNB* at HO) from Kasme and SYNC
+def conv_401_A4(Kasme, SYNC):
+    """A4 conversion function
+    
+    return NH [32 bytes buffer] from 
+        Kasme [32 bytes buffer] and 
+        SYNC [32 bytes buffer]
+    or None on error
+    """
+    if len(Kasme) != 32 or len(SYNC) != 32:
+        log('ERR', 'conv_A4: invalid args')
+        return None
+    return KDF(Kasme, b'\x12' + SYNC + b'\0\x20')
+
+
+# NAS / RRC+UP keys derivation from Kasme / KeNB
+def conv_401_A7(KEY, alg_dist=0, alg_id=0):
+    """A7 conversion function
+    
+    return NAS or RRC and UP key [32 bytes buffer] from 
+        KEY (Kasme or KeNB) [32 bytes buffer],
+        algorithm dist [uint8] and
+        algorithm id [uint8]
+    or None on error
+    """
+    if len(KEY) != 32 or not (0 <= alg_dist < 256) or not (0 <= alg_id < 256):
+        log('ERR', 'conv_A7: invalid args')
+        return None
+    return KDF(KEY, b'\x15' + pack('>BHBH', alg_dist, 1, alg_id, 1))
+
+
+#------------------------------------------------------------------------------#
+# 3G / 5G and LTE / 5G conversion functions
+#------------------------------------------------------------------------------#
+# see TS 33.501, annex A
+
+def  conv_501_A2(CK, IK, sn_name, sqn_x_ak):
+    """A2 conversion function
+    
+    return KAUSF [32 bytes buffer] from
         3G CK and IK USIM output [16 bytes buffer each],
         Serving network name [bytes buffer, e.g. b"5G:mnc001.mcc001.3gppnetwork.org"] and
         SQN^AK [6 bytes buffer]
@@ -144,7 +297,7 @@ def conv_501_A6(KAUSF, sn_name):
     """A6 conversion function
     
     return K_SEAF [32 bytes buffer] from
-        K_AUSF [32 bytes buffer] and
+        KAUSF [32 bytes buffer] and
         Serving network name [bytes buffer, e.g. b"5G:mnc001.mcc001.3gppnetwork.org"]
     or raise CMException
     """
@@ -329,7 +482,7 @@ def conv_501_A17(KAUSF, sor_hdr, sor_cnt=0, pref_plmn=None):
     """A17 conversion function
     
     return SoR-MAC-I_AUSF [16 bytes buffer] from
-        K_AUSF [32 bytes buffer],
+        KAUSF [32 bytes buffer],
         SoR header [bytes buffer],
         SoR counter [uint16] and
         Preferred PLMNs / Access Tech [bytes buffer, optional]
@@ -353,7 +506,7 @@ def conv_501_A18(KAUSF, sor_ack=1, sor_cnt=0):
     """A18 conversion function
     
     return SoR-MAC-I_UE [16 bytes buffer] from
-        K_AUSF [32 bytes buffer],
+        KAUSF [32 bytes buffer],
         SoR acknowledgement [uint8, value 1] and
         SoR counter [uint16]
     or raise CMException
@@ -367,7 +520,7 @@ def conv_501_A19(KAUSF, upu_data, upu_cnt=0):
     """A19 conversion function
     
     return UPU-MAC-I_AUSF [16 bytes buffer] from
-        K_AUSF [32 bytes buffer],
+        KAUSF [32 bytes buffer],
         UPU data [bytes buffer] and
         UPU counter [uint16]
     or raise CMException
@@ -381,7 +534,7 @@ def conv_501_A20(KAUSF, upu_ack=1, upu_cnt=0):
     """A20 conversion function
     
     return UPU-MAC-I_UE [16 bytes buffer] from
-        K_AUSF [32 bytes buffer],
+        KAUSF [32 bytes buffer],
         UPU acknowledgement [uint8, value 1] and
         UPU counter [uint16]
     or raise CMException
@@ -463,7 +616,4 @@ def test():
     conv_501_A21(K32, 0)
     #conv_501_A22(K32, 0)
     conv_501_A23(K32, K16, K16)
-    
 
-# TODO:
-# move conversion functions out of the Milenage.py module and put them here
