@@ -136,11 +136,12 @@ def testall():
 
 
 def testperf():
-    a = None
     T0 = time()
     for i in range(1000):
-        a = testall()
-    print('1000 full testsets in %.3f seconds' % (time()-T0, ))
+        if not testall():
+            print('testset failing... exiting')
+            return
+    print('1000 full Milenage testsets in %.3f seconds' % (time()-T0, ))
 
 
 def test_Milenage():
