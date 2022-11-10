@@ -83,8 +83,9 @@ class ECDH_SECP256R1(object):
     """wrapper around Python cryptography library to handle an ECDH  exchange over 
     a NIST secp256r1 elliptic curve
     
-    private key and public key are handle as bytes buffer, which are compressed
-    point according to ANSI X9.62
+    private key and public key are handle as simple bytes buffer,
+    private key is the private value encoded as is
+    public key is the compressed point value encoded according to ANSI X9.62
     """
     
     def __init__(self, loc_privkey=None):
@@ -107,10 +108,7 @@ class ECDH_SECP256R1(object):
             encoding=serialization.Encoding.X962)
     
     def get_privkey(self):
-        return self.PrivKey.private_bytes(
-            encoding=serialization.Encoding.X962,
-            format=serialization.PrivateFormat.PKCS8,
-            encryption_algorithm=serialization.NoEncryption())
+        return bytes_from_int(self.PrivKey.private_numbers().private_value, 32)
     
     def generate_sharedkey(self, ext_pubkey):
         ExtPubKey = ec.EllipticCurvePublicKey.from_encoded_point(

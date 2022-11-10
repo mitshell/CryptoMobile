@@ -70,8 +70,10 @@ def test_profileA():
     hn_ct = hn.unprotect(ue_pk, ue_ct, ue_mac)
     
     return x1.get_pubkey() == eph_pubkey and \
+    x1.get_privkey() == eph_privkey and \
     x1.generate_sharedkey(hn_pubkey) == shared_key and \
     x2.get_pubkey() == hn_pubkey and \
+    x2.get_privkey() == hn_privkey and \
     x2.generate_sharedkey(eph_pubkey) == shared_key and \
     ue_ct == ciphertext and ue_mac == mactag and hn_ct == plaintext
 
@@ -98,7 +100,11 @@ def test_profileB():
     ue_pk, ue_ct, ue_mac = ue.protect(plaintext)
     hn_ct = hn.unprotect(ue_pk, ue_ct, ue_mac)
     
-    return x1.generate_sharedkey(hn_pubkey) == shared_key and \
+    return x1.get_pubkey() == eph_pubkey and \
+    x1.get_privkey() == eph_privkey and \
+    x1.generate_sharedkey(hn_pubkey) == shared_key and \
+    x2.get_pubkey() == hn_pubkey and \
+    x2.get_privkey() == hn_privkey and \
     x2.generate_sharedkey(eph_pubkey) == shared_key and \
     ue_ct == ciphertext and ue_mac == mactag and hn_ct == plaintext
 
@@ -111,7 +117,9 @@ def testperf():
     a = None
     T0 = time()
     for i in range(1000):
-        a = testall()
+        if not testall():
+            print('error in the testset')
+            return
     print('1000 full testsets in %.3f seconds' % (time()-T0, ))
 
 

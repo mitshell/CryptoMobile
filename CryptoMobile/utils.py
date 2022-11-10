@@ -47,6 +47,9 @@ if py_vers > 2:
     def int_from_bytes(b):
         return int.from_bytes(b, 'big')
     
+    def bytes_from_int(i, length):
+        return i.to_bytes(length, 'big')
+    
 else:
     
     def xor_buf(b1, b2):
@@ -55,6 +58,9 @@ else:
 
     def int_from_bytes(b):
         return reduce(lambda x, y: (x<<8) + y, map(ord, b))
+    
+    def bytes_from_int(i, length):
+        return bytes(bytearray([(i>>o) & 0xff for o in range(8*(length-1), -1, -8)]))
 
 
 # CryptoMobile-wide Exception handler
