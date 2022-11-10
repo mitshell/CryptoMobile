@@ -1,7 +1,7 @@
 # −*− coding: UTF−8 −*−
 #/**
 # * Software Name : CryptoMobile 
-# * Version : 0.3
+# * Version : 0.4
 # *
 # * Copyright 2020. Benoit Michau. P1Sec.
 # *
@@ -102,14 +102,11 @@ class ECIES_HN(object):
     to unprotect a subscriber's SUCI into a fixed identity SUPI
     """
     
-    def __init__(self, hn_priv_key, profile='A', _raw_keypair=None):
+    def __init__(self, hn_priv_key, profile='A'):
         if profile == 'A':
             self.EC = X25519(loc_privkey=hn_priv_key)
         elif profile == 'B':
-            if isinstance(_raw_keypair, (tuple, list)) and len(_raw_keypair) == 2:
-                self.EC = ECDH_SECP256R1(_raw_keypair=_raw_keypair)
-            else:
-                self.EC = ECDH_SECP256R1(loc_privkey=hn_priv_key)
+            self.EC = ECDH_SECP256R1(loc_privkey=hn_priv_key)
         else:
             raise(CMException('unknown ECIES profile %s' % profile))
     

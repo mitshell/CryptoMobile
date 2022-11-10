@@ -1,7 +1,7 @@
 # −*− coding: UTF−8 −*−
 #/**
 # * Software Name : CryptoMobile 
-# * Version : 0.3
+# * Version : 0.4
 # *
 # * Copyright 2020. Benoit Michau. P1Sec.
 # *
@@ -83,29 +83,18 @@ class ECDH_SECP256R1(object):
     """wrapper around Python cryptography library to handle an ECDH  exchange over 
     a NIST secp256r1 elliptic curve
     
-    private key is handled within a DER-encoded PKCS8 structure
-    public key is handled as a compressed point bytes buffer according to ANSI X9.62
+    private key and public key are handle as bytes buffer, which are compressed
+    point according to ANSI X9.62
     """
     
-    def __init__(self, loc_privkey=None, _raw_keypair=None):
-        if loc_privkey:
-            self.PrivKey = serialization.load_der_private_key(
-                loc_privkey,
-                password=None,
-                backend=_backend)
-            if not hasattr(self.PrivKey, 'curve') or not isinstance(self.PrivKey.curve, ec.SECP256R1):
-                raise(CMException('invalid secp256r1 private key'))
-        elif isinstance(_raw_keypair, (tuple, list)) and len(_raw_keypair) == 2:
-            self._load_raw_keypair(*_raw_keypair)
-        else:
+    def __init__(self, loc_privkey=None):
+        if not loc_privkey:
             self.generate_keypair()
-    
-    def _load_raw_keypair(self, privkey, pubkey):
-        self.PrivKey = ec.EllipticCurvePrivateNumbers(
-            private_value=int_from_bytes(privkey),
-            public_numbers=ec.EllipticCurvePublicKey.from_encoded_point(
-                curve=ec.SECP256R1(),
-                data=pubkey).public_numbers()).private_key(backend=_backend)
+        else:
+            self.PrivKey = ec.derive_private_key(
+                int_from_bytes(loc_privkey),
+                ec.SECP256R1(),
+                backend=_backend)
     
     def generate_keypair(self):
         self.PrivKey = ec.generate_private_key(
@@ -119,7 +108,7 @@ class ECDH_SECP256R1(object):
     
     def get_privkey(self):
         return self.PrivKey.private_bytes(
-            encoding=serialization.Encoding.DER,
+            encoding=serialization.Encoding.X962,
             format=serialization.PrivateFormat.PKCS8,
             encryption_algorithm=serialization.NoEncryption())
     

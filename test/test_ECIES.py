@@ -1,7 +1,7 @@
 # −*− coding: UTF−8 −*−
 #/**
 # * Software Name : CryptoMobile 
-# * Version : 0.3
+# * Version : 0.4
 # *
 # * Copyright 2020. Benoit Michau. P1Sec.
 # *
@@ -37,8 +37,14 @@ from time     import time
 from binascii import unhexlify
 
 from cryptography.hazmat.primitives.asymmetric.x25519   import X25519PrivateKey
-from CryptoMobile.EC    import *
 from CryptoMobile.ECIES import *
+from CryptoMobile.EC    import (
+    X25519,
+    ECDH_SECP256R1, 
+    int_from_bytes,
+    ec,
+    _backend
+    )
 
 
 # annex C.4.3, ECIES Profile A test data
@@ -82,12 +88,12 @@ def test_profileB():
     ciphertext  = unhexlify('46A33FC271')
     mactag      = unhexlify('6AC7DAE96AA30A4D')
     
-    x1 = ECDH_SECP256R1(_raw_keypair=(eph_privkey, eph_pubkey))
-    x2 = ECDH_SECP256R1(_raw_keypair=(hn_privkey, hn_pubkey))
+    x1 = ECDH_SECP256R1(eph_privkey)
+    x2 = ECDH_SECP256R1(hn_privkey)
     
     ue = ECIES_UE(profile='B')
-    ue.EC._load_raw_keypair(eph_privkey, eph_pubkey)
-    hn = ECIES_HN(None, profile='B', _raw_keypair=(hn_privkey, hn_pubkey))
+    ue.EC.PrivKey = ec.derive_private_key(int_from_bytes(eph_privkey), ec.SECP256R1(), backend=_backend)
+    hn = ECIES_HN(profile='B', hn_priv_key=hn_privkey)
     ue.generate_sharedkey(hn_pubkey, fresh=False)
     ue_pk, ue_ct, ue_mac = ue.protect(plaintext)
     hn_ct = hn.unprotect(ue_pk, ue_ct, ue_mac)
