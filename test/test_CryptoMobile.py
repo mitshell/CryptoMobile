@@ -29,16 +29,28 @@
 
 import unittest
 
-from test.test_CM       import test_CM
-from test.test_TUAK     import test_TUAK
+from test.test_CM       import (
+    test_CM,
+    testperf as testperf_CM
+    )
+from test.test_TUAK     import (
+    test_TUAK,
+    testperf as testperf_TUAK
+    )
 try:
-    from test.test_Milenage import test_Milenage
+    from test.test_Milenage import (
+        test_Milenage,
+        testperf as testperf_Milenage
+        )
 except ImportError:
     _with_aes = False
 else:
     _with_aes = True
     try:
-        from test.test_ECIES    import test_ECIES
+        from test.test_ECIES    import (
+            test_ECIES,
+            testperf as testperf_ECIES
+            )
     except ImportError:
         _with_ec = False
     else:
@@ -68,3 +80,11 @@ class TestCryptoMobile(unittest.TestCase):
                 print('[<>] testing CryptoMobile.ECIES')
                 test_ECIES()
 
+
+if __name__ == '__main__':
+    testperf_CM()
+    testperf_TUAK()
+    if _with_aes:
+        testperf_Milenage()
+        if _with_ec:
+            testperf_ECIES()

@@ -295,11 +295,12 @@ def testall():
 
 
 def testperf():
-    a = None
     T0 = time()
     for i in range(10000):
-        a = testall()
-    print('10000 full testsets in %.3f seconds' % (time()-T0, ))
+        if not testall():
+            print('testset failing... exiting')
+            return
+    print('10000 full TUAK testsets in %.3f seconds' % (time()-T0, ))
 
 
 def test_TUAK():

@@ -114,13 +114,12 @@ def testall():
 
 
 def testperf():
-    a = None
     T0 = time()
     for i in range(1000):
         if not testall():
-            print('error in the testset')
+            print('testset failing... exiting')
             return
-    print('1000 full testsets in %.3f seconds' % (time()-T0, ))
+    print('1000 full ECIES testsets in %.3f seconds' % (time()-T0, ))
 
 
 def test_ECIES():
