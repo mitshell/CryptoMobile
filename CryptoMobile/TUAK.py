@@ -49,8 +49,9 @@ from .utils        import *
 __all__ = ['TUAK', 'make_TOPc']
 
 
-def make_TOPc( K, TOP ):
-    """derives TOP with K to produce TOPc"""
+def make_TOPc( K, TOP, ALGONAME, KeccakIterations ):
+    """derives TOP with K to produce TOPc
+    requires the TUAK global parameters ALGONAME and KeccakIterations"""
     if len(K) == 16:
         INSTANCE = b'\x00'
     else:
@@ -60,7 +61,7 @@ def make_TOPc( K, TOP ):
     INOUT = []
     INOUT.append( TOP[::-1] )
     INOUT.append( INSTANCE[::-1] )
-    INOUT.append( TUAK.ALGONAME[::-1] )
+    INOUT.append( ALGONAME[::-1] )
     INOUT.append( b'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0' )
     INOUT.append( K[::-1] )
     if len(K) == 16:
@@ -71,7 +72,7 @@ def make_TOPc( K, TOP ):
                   b'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0' )
     INOUT = b''.join(INOUT)
     
-    for i in range(TUAK.KeccakIterations):
+    for i in range(KeccakIterations):
         INOUT = keccakp1600(INOUT)
     return INOUT[:32][::-1]
 
@@ -106,8 +107,17 @@ class TUAK:
         self.TOP  = TOP
         self.TOPc = None
     
+    def make_topc(self, K, TOP=None):
+        """return the TOPc value derived from K, TOP and the TUAK configuration
+        if TOP is None, relies on the instance self.TOP value
+        """
+        if TOP is None:
+            return make_TOPc(K, self.TOP, self.ALGONAME, self.KeccakIterations)
+        else:
+            return make_TOPc(K, TOP, self.ALGONAME, self.KeccakIterations)
+    
     def set_topc(self, TOPc):
-        """This sets TOPc and saves some Keccak rounds in f1, f1star, f2345, f5star
+        """set TOPc and save some Keccak rounds in f1, f1star, f2345, f5star
         when producing several vectors for a single subscriber
         """
         self.TOPc = TOPc
@@ -145,10 +155,8 @@ class TUAK:
         
         if self.TOPc is not None:
             TOPc = self.TOPc
-        elif TOP is not None:
-            TOPc = make_TOPc(K, TOP)
         else:
-            TOPc = make_TOPc(K, self.TOP)
+            TOPc = self.make_TOPc(K, TOP)
         
         INOUT = []
         INOUT.append( TOPc[::-1] )
@@ -196,10 +204,8 @@ class TUAK:
         
         if self.TOPc is not None:
             TOPc = self.TOPc
-        elif TOP is not None:
-            TOPc = make_TOPc(K, TOP)
         else:
-            TOPc = make_TOPc(K, self.TOP)
+            TOPc = self.make_TOPc(K, TOP)
         
         INOUT = []
         INOUT.append( TOPc[::-1] )
@@ -261,10 +267,8 @@ class TUAK:
         
         if self.TOPc is not None:
             TOPc = self.TOPc
-        elif TOP is not None:
-            TOPc = make_TOPc(K, TOP)
         else:
-            TOPc = make_TOPc(K, self.TOP)
+            TOPc = self.make_TOPc(K, TOP)
         
         INOUT = []
         INOUT.append( TOPc[::-1] )
@@ -303,10 +307,8 @@ class TUAK:
         
         if self.TOPc is not None:
             TOPc = self.TOPc
-        elif TOP is not None:
-            TOPc = make_TOPc(K, TOP)
         else:
-            TOPc = make_TOPc(K, self.TOP)
+            TOPc = self.make_TOPc(K, TOP)
         
         INOUT = []
         INOUT.append( TOPc[::-1] )
