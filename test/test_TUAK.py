@@ -37,7 +37,7 @@
 
 from time import time
 
-from CryptoMobile.TUAK import TUAK, make_TOPc, keccakp1600
+from CryptoMobile.TUAK import TUAK, keccakp1600
 
 TUAK.KeccakIterations = 1
 
@@ -85,7 +85,7 @@ def tuak_testset_61():
     
     tuak = TUAK(TOP)
     tuak.LEN_MAC = 64
-    TOPc = make_TOPc(K, TOP)
+    TOPc = tuak.make_topc(K, TOP)
     tuak.set_topc(TOPc)
     
     return TOPc == b'\xbd\x04\xd9S\x0e\x87Q<]\x83z\xc2\xad\x95F#\xa8\xe23\x0c\x11S\x05\xa7>\xb4]\x1f@\xcc\xcb\xff' and \
@@ -101,7 +101,7 @@ def tuak_testset_62():
     
     tuak = TUAK(TOP)
     tuak.LEN_MAC = 128
-    TOPc = make_TOPc(K, TOP)
+    TOPc = tuak.make_topc(K, TOP)
     tuak.set_topc(TOPc)
     
     return TOPc == b'0T%B~\x18\xc5\x03\xc8\xa4\xb2\x94\xear\xc9]\x0c6\xc6\xc6\xb2\x9d\x0ce\xdeYt\xd5\x97\x7f\x85$' and \
@@ -117,7 +117,7 @@ def tuak_testset_63():
     
     tuak = TUAK(TOP)
     tuak.LEN_MAC = 256
-    TOPc = make_TOPc(K, TOP)
+    TOPc = tuak.make_topc(K, TOP)
     tuak.set_topc(TOPc)
     
     return TOPc == b'0T%B~\x18\xc5\x03\xc8\xa4\xb2\x94\xear\xc9]\x0c6\xc6\xc6\xb2\x9d\x0ce\xdeYt\xd5\x97\x7f\x85$' and \
@@ -133,7 +133,7 @@ def tuak_testset_64():
     
     tuak = TUAK(TOP)
     tuak.LEN_MAC = 128
-    TOPc = make_TOPc(K, TOP)
+    TOPc = tuak.make_topc(K, TOP)
     tuak.set_topc(TOPc)
     
     return TOPc == b"+\xc1n\xb6W\xa6\x8e\x1fDo\x08\xf5|\x0e\xfb\x1dI5'\xa2\xe6R\xce(\x1e\xb6\xca\x0eD\x87v\n" and \
@@ -149,7 +149,7 @@ def tuak_testset_65():
     
     tuak = TUAK(TOP)
     tuak.LEN_MAC = 64
-    TOPc = make_TOPc(K, TOP)
+    TOPc = tuak.make_topc(K, TOP)
     tuak.set_topc(TOPc)
     
     return TOPc == b'<`R\xe4\x152\xa2\x8aG\xaa<\xbb\x89\xf2#\xe8\xf3\xaa\xa9v\xae\xcdH\xbc>}ae\xa5^\xffb' and \
@@ -166,7 +166,7 @@ def tuak_testset_66():
     
     tuak = TUAK(TOP)
     tuak.LEN_MAC = 256
-    TOPc = make_TOPc(K, TOP)
+    TOPc = tuak.make_topc(K, TOP)
     tuak.set_topc(TOPc)
     
     ret = ( TOPc == b'\xb0Jf\xf2lb\xfc\xd6\xc8-\xe2*\x17\x9a\xb6U\x06\xec\xf4\x7fV$\\\xd1I\x96l\xfa\x9c\xeczQ' and \
@@ -191,7 +191,7 @@ def tuak_testset_71():
     tuak.LEN_CK  = 128
     tuak.LEN_IK  = 128
     tuak.LEN_RES = 32
-    TOPc = make_TOPc(K, TOP)
+    TOPc = tuak.make_topc(K, TOP)
     tuak.set_topc(TOPc)
     
     return tuak.f2345(K, RAND) == (b'ez\xcdd', b'\xd7\x1a\x1e\\l\xaf\xfe\x98j&\xf7\x83\xe5\xc7\x8b\xe1',
@@ -207,7 +207,7 @@ def tuak_testset_72():
     tuak.LEN_CK  = 128
     tuak.LEN_IK  = 128
     tuak.LEN_RES = 64
-    TOPc = make_TOPc(K, TOP)
+    TOPc = tuak.make_topc(K, TOP)
     tuak.set_topc(TOPc)
     
     return tuak.f2345(K, RAND) == (b'\xe9\xd7I\xdcN\xea\x005', b"\xa4\xcboe)\xab\x17\xf83\x7f'\xba\xa8#MG",
@@ -223,7 +223,7 @@ def tuak_testset_73():
     tuak.LEN_CK  = 128
     tuak.LEN_IK  = 256
     tuak.LEN_RES = 64
-    TOPc = make_TOPc(K, TOP)
+    TOPc = tuak.make_topc(K, TOP)
     tuak.set_topc(TOPc)
     
     return tuak.f2345(K, RAND) == (b'\x07\x02\x1cs\xe7c\\}', b'MY\xacyh4\xeb\x85\xd1\x1f\xa1H\xa5\x05\x8c<',
@@ -239,7 +239,7 @@ def tuak_testset_74():
     tuak.LEN_CK  = 128
     tuak.LEN_IK  = 128
     tuak.LEN_RES = 128
-    TOPc = make_TOPc(K, TOP)
+    TOPc = tuak.make_topc(K, TOP)
     tuak.set_topc(TOPc)
     
     return tuak.f2345(K, RAND) == (b'@A\xceC\x8e>8\xe8\xaa\x96V.\xed\x83\xacC',
@@ -255,7 +255,7 @@ def tuak_testset_75():
     tuak.LEN_CK  = 256
     tuak.LEN_IK  = 128
     tuak.LEN_RES = 256
-    TOPc = make_TOPc(K, TOP)
+    TOPc = tuak.make_topc(K, TOP)
     tuak.set_topc(TOPc)
     
     return tuak.f2345(K, RAND) == (b'\x84\xd8\x9bA\xdb\x18g\xff\xd4\xc7\xba\x1d\x82\x16?MRj \xfb\xaeT\x18\xfb\xb5&\x94\x0b\x1e\xeb\x90\\',
@@ -273,7 +273,7 @@ def tuak_testset_76():
     tuak.LEN_CK  = 256
     tuak.LEN_IK  = 256
     tuak.LEN_RES = 256
-    TOPc = make_TOPc(K, TOP)
+    TOPc = tuak.make_topc(K, TOP)
     tuak.set_topc(TOPc)
     
     ret = tuak.f2345(K, RAND) == (b'\xd6~ndY\r"\xee\xcb\xa72J\xfaJ\xf4F\x0c\x93\xf0\x1b$Pmn\x12\x04}x\x9a\x94\xc8g',
