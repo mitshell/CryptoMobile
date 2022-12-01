@@ -156,12 +156,12 @@ class TUAK:
         if self.TOPc is not None:
             TOPc = self.TOPc
         else:
-            TOPc = self.make_TOPc(K, TOP)
+            TOPc = self.make_topc(K, TOP)
         
         INOUT = []
         INOUT.append( TOPc[::-1] )
         INOUT.append( INSTANCE[::-1] )
-        INOUT.append( TUAK.ALGONAME[::-1] )
+        INOUT.append( self.ALGONAME[::-1] )
         INOUT.append( RAND[::-1] )
         INOUT.append( AMF[::-1] )
         INOUT.append( SQN[::-1] )
@@ -174,7 +174,7 @@ class TUAK:
                       b'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0' )
         INOUT = b''.join(INOUT)
         
-        for i in range(TUAK.KeccakIterations):
+        for i in range(self.KeccakIterations):
             INOUT = keccakp1600(INOUT)
         return INOUT[:off][::-1]
     
@@ -205,12 +205,12 @@ class TUAK:
         if self.TOPc is not None:
             TOPc = self.TOPc
         else:
-            TOPc = self.make_TOPc(K, TOP)
+            TOPc = self.make_topc(K, TOP)
         
         INOUT = []
         INOUT.append( TOPc[::-1] )
         INOUT.append( INSTANCE[::-1] )
-        INOUT.append( TUAK.ALGONAME[::-1] )
+        INOUT.append( self.ALGONAME[::-1] )
         INOUT.append( RAND[::-1] )
         INOUT.append( AMF[::-1] )
         INOUT.append( SQN[::-1] )
@@ -223,7 +223,7 @@ class TUAK:
                       b'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0' )
         INOUT = b''.join(INOUT)
         
-        for i in range(TUAK.KeccakIterations):
+        for i in range(self.KeccakIterations):
             INOUT = keccakp1600(INOUT)
         return INOUT[:off][::-1]
     
@@ -268,12 +268,12 @@ class TUAK:
         if self.TOPc is not None:
             TOPc = self.TOPc
         else:
-            TOPc = self.make_TOPc(K, TOP)
+            TOPc = self.make_topc(K, TOP)
         
         INOUT = []
         INOUT.append( TOPc[::-1] )
         INOUT.append( INSTANCE[::-1] )
-        INOUT.append( TUAK.ALGONAME[::-1] )
+        INOUT.append( self.ALGONAME[::-1] )
         INOUT.append( RAND[::-1] )
         INOUT.append( b'\0\0\0\0\0\0\0\0' )
         INOUT.append( K[::-1] )
@@ -285,7 +285,7 @@ class TUAK:
                       b'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0' )
         INOUT = b''.join(INOUT)
         
-        for i in range(TUAK.KeccakIterations):
+        for i in range(self.KeccakIterations):
             INOUT = keccakp1600(INOUT)
         return INOUT[:offres][::-1], INOUT[32:32+offck][::-1], INOUT[64:64+offik][::-1], INOUT[96:102][::-1]
     
@@ -308,12 +308,12 @@ class TUAK:
         if self.TOPc is not None:
             TOPc = self.TOPc
         else:
-            TOPc = self.make_TOPc(K, TOP)
+            TOPc = self.make_topc(K, TOP)
         
         INOUT = []
         INOUT.append( TOPc[::-1] )
         INOUT.append( INSTANCE[::-1] )
-        INOUT.append( TUAK.ALGONAME[::-1] )
+        INOUT.append( self.ALGONAME[::-1] )
         INOUT.append( RAND[::-1] )
         INOUT.append( b'\0\0\0\0\0\0\0\0' )
         INOUT.append( K[::-1] )
@@ -325,7 +325,7 @@ class TUAK:
                       b'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0' )
         INOUT = b''.join(INOUT)
         
-        for i in range(TUAK.KeccakIterations):
+        for i in range(self.KeccakIterations):
             INOUT = keccakp1600(INOUT)
         return INOUT[96:102][::-1]
 
