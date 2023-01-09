@@ -41,6 +41,7 @@ from .utils import *
 # try to load pycrypto
 try:
     from Crypto.Cipher import AES as AES_pycrypto
+    from Crypto.Util   import Counter as Counter_pycrypto
 except ImportError:
     _with_pycrypto = False
 else:
@@ -137,19 +138,10 @@ class AES_CTR_pycrypto(object):
         cnt  : uint64, 8 least significant bytes value of the counter
                default is 0
         """
-        self.cnt_hi = nonce
-        self.cnt_lo = cnt
         self.aes = AES_pycrypto.new(
             key,
             AES_pycrypto.MODE_CTR,
-            counter=self.__cnt)
-    
-    def __cnt(self):
-        cnt = self.cnt_hi + pack('>Q', self.cnt_lo)
-        self.cnt_lo += 1
-        if self.cnt_lo == MAX_UINT64:
-            self.cnt_lo = 0
-        return cnt
+            counter=Counter_pycrypto.new(64, prefix=nonce, initial_value=cnt))
     
     def encrypt(self, data):
         """encrypt / decrypt data with the key and IV set at initialization"""
