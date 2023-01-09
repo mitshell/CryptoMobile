@@ -28,11 +28,11 @@ AES:
 - [pycryptodome](https://www.pycryptodome.org/) or
 - [cryptography](https://cryptography.io/en/latest/)
 
-The ECIES module require the last one (cryptography) to work, as no support for ECIES 
+The ECIES module requires the last one (cryptography) to work, as no support for ECIES 
 with pycryptodome as been developped yet.
 
 
-This library supports both Python 2.7 and 3 versions.
+This library supports both Python 2.7 and 3.X versions.
 An installation script is available: it installs the library within your Python 
 package directory:
 
