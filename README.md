@@ -4,10 +4,12 @@
 The fork at [P1sec](https://github.com/P1sec/CryptoMobile) is going to be more actively maintained and extended than this project.
 Do not hesitate to clone it instead of this one.
 
+
 ## About
 This toolkit implements python wrappers around 3G and LTE encryption and 
 integrity protection algorithms, COMP128, Milenage and TUAK authentication 
 algorithms, and ECIES identity protection scheme.
+
 
 ## Disclaimer
 This is delivered for study only: beware that cryptographic material, 
@@ -15,19 +17,22 @@ especially ciphering algorithms are always subject to national regulation.
 Moreover, use in real networks and equipments of some of the algorithms provided
 are subect to agreement / licensing by the GSMA and / or the ETSI:
 see [GSMA](https://www.gsma.com/aboutus/leadership/committees-and-groups/working-groups/fraud-security-group/security-algorithms)
-and [ETSI](http://www.etsi.org/about/what-we-do/security-algorithms-and-codes/cellular-algorithm-licences).
+and [ETSI](https://www.etsi.org/security-algorithms-and-codes/security-algorithms).
+
 
 ## Installation
 The standard installation process is to use the CPython build environment to compile
 C files and install them together with the Python wrappers. The Milenage and EEA2/EIA2
 algorithms moreover require one of the following Python cryptographic library to support
 AES:
-- [pycrypto](https://github.com/dlitz/pycrypto) or
-- [pycryprodomex](https://www.pycryptodome.org/en/latest/src/installation.html) or
-- [cryptography](https://cryptography.io/en/latest/) (the ECIES module requires it)
+- [pycryptodome](https://www.pycryptodome.org/en/latest/src/installation.html) or
+- [cryptography](https://cryptography.io/en/latest/)
+
+The ECIES module require the last one (cryptography) to work, as no support for ECIES 
+with pycryptodome as been developped yet.
 
 
-This library supports both Python 2 and 3 versions.
+This library supports both Python 2.7 and 3 versions.
 An installation script is available: it installs the library within your Python 
 package directory:
 
@@ -58,10 +63,14 @@ renamed to .cc by the install script in order to get them compiled correctly by 
 
 To be noted also that the library builds and runs fine with pypy3.
 
+
 ### Installing the ctypes version instead of the CPython wrappers
-There is still the possibility to install manually the historical version of the library which uses
-Python-only _ctypes_ source files. A *CM_ctypes.py* is available in the \_ctypes directory 
-for this purpose.
+There is still the possibility to install manually the historical version (before 2019) 
+of the library which uses Python-only _ctypes_ source files. A *CM_ctypes.py* is available 
+in the \_ctypes directory for this purpose.
+Please note that this part is not supported anymore, no more tested, and may not work correctly
+or even at all.
+
 
 ## Usage
 Most of the classes and methods have docstrings. Just read them to get information
@@ -71,6 +80,7 @@ on how to use and call them.
 Warning: most of the C reference implementations are using global or static variables,
 which are making them not thread-safe. Using them through Python is however OK thanks 
 to the GIL, but beware in case you want to use them directly from C.
+
 
 ### CMAC mode of operation
 This is the CBC-MAC mode as defined by NIST. It works with any block cipher primitive,
@@ -160,6 +170,7 @@ Some conversion functions are also provided in the Milenage module:
 - conv\_C2, conv\_C3, conv\_C4 and conv\_C5 for 2G / 3G authentication vectors conversion
 - conv\_A2, conv\_A3, conv\_A4 and conv\_A7 for LTE key derivation and 3G / LTE authentication 
    vectors conversion
+
 
 ### TUAK
 This is the Python wrapper over the TUAK algorithm. The mode of operation is written
@@ -261,6 +272,7 @@ b'\xe0\x8e\xde\x85'
 The EEA1-128 and EIA1-128 modes of operation for LTE are similar to F8 and F9 for 3G
 networks.
 
+
 ### ZUC-based encryption and integrity protection algorithms
 This is a Python wrapper around the reference C code of ZUC and its mode of operation
 for LTE networks. ZUC is a stream cipher working with 32 bit words.
@@ -327,6 +339,7 @@ b"MonPantalonS'EstDecousuMonPantalonS'EstDecousuMonPantalonS'EstDecousuMonPantal
 b'\xa9\xc5h\x9e'
 ```
 
+
 ### ECIES module to support 5G SUPI / SUCI protection scheme
 The ECIES module, which relies on the python cryptography library, supports both
 ECIES profiles A and B, as described in 3GPP TS 33.501, annex C.
@@ -376,6 +389,7 @@ to be then decrypted within the home network:
 True
 ```
 
+
 ### running Milenage, TUAK, ECIES, UMTS and LTE algorithms test vectors
 By running the setup test (see installation), test vectors will all be run.
 You can also run some performance test by hand:
@@ -390,6 +404,7 @@ $ python test/test_TUAK.py
 $ python test/test_ECIES.py
 1000 full testsets in 2.202 seconds
 ```
+
 
 ## Content
 The library is structured into 3 main parts:
@@ -415,6 +430,7 @@ Within the CryptoMobile directory, we have the following modules:
 - TUAK.py: provides the TUAK algorithm.
 - EC.py: provides both Curve25519 and secp256r1 elliptic curve modules for key exchange
 - ECIES.py: provides ECIES processing for 5G SUPI / SUCI protection scheme
+
 
 ## Credits
 - ETSI / SAGE for providing public cryptographic specifications, together with
