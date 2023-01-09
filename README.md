@@ -25,7 +25,7 @@ The standard installation process is to use the CPython build environment to com
 C files and install them together with the Python wrappers. The Milenage and EEA2/EIA2
 algorithms moreover require one of the following Python cryptographic library to support
 AES:
-- [pycryptodome](https://www.pycryptodome.org/en/latest/src/installation.html) or
+- [pycryptodome](https://www.pycryptodome.org/) or
 - [cryptography](https://cryptography.io/en/latest/)
 
 The ECIES module require the last one (cryptography) to work, as no support for ECIES 
