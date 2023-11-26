@@ -1,9 +1,5 @@
 # CryptoMobile toolkit
 
-## Update 2019
-The fork at [P1sec](https://github.com/P1sec/CryptoMobile) is going to be more actively maintained and extended than this project.
-Do not hesitate to clone it instead of this one.
-
 
 ## About
 This toolkit implements python wrappers around 3G and LTE encryption and 
