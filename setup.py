@@ -66,7 +66,7 @@ setup(
     description='CryptoMobile provides (C)Python bindings to reference implementations '\
                 'in C of mobile cryptographic algorithms: Comp128, Milenage, TUAK, Kasumi, SNOW-3G, ZUC',
     long_description=open('README.md', 'r').read(),
-    url='https://github.com/P1Sec/CryptoMobile/',
+    url='https://github.com/mitshell/CryptoMobile/',
     keywords='cryptography mobile network Kasumi SNOW ZUC Milenage Comp128 TUAK',
     license='GPLv2+',
     )
