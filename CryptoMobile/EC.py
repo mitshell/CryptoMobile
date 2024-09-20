@@ -68,10 +68,11 @@ class X25519(object):
             encoding=serialization.Encoding.Raw,
             format=serialization.PublicFormat.Raw)
     
-    def get_privkey(self):
+    def get_privkey(self, encoding=serialization.Encoding.Raw,
+                    format=serialization.PrivateFormat.Raw):
         return self.PrivKey.private_bytes(
-            encoding=serialization.Encoding.Raw,
-            format=serialization.PrivateFormat.Raw,
+            encoding=encoding,
+            format=format,
             encryption_algorithm=serialization.NoEncryption())
     
     def generate_sharedkey(self, ext_pubkey):
@@ -109,7 +110,13 @@ class ECDH_SECP256R1(object):
     
     def get_privkey(self):
         return bytes_from_int(self.PrivKey.private_numbers().private_value, 32)
-    
+
+    def get_privkey_pem(self):
+        return self.PrivKey.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.PKCS8,
+            encryption_algorithm=serialization.NoEncryption())
+
     def generate_sharedkey(self, ext_pubkey):
         ExtPubKey = ec.EllipticCurvePublicKey.from_encoded_point(
             curve=ec.SECP256R1(),
@@ -123,4 +130,3 @@ def KDF(sharedinfo, sharedkey):
          length=64, # 16 bytes AES key, 16 bytes AES CTR IV, 32 bytes HMAC-SHA-256 key
          sharedinfo=sharedinfo,
          backend=_backend).derive(sharedkey)
-
