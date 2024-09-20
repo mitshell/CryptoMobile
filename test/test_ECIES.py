@@ -37,6 +37,7 @@ from time     import time
 from binascii import unhexlify
 
 from cryptography.hazmat.primitives.asymmetric.x25519   import X25519PrivateKey
+from cryptography.hazmat.primitives import serialization
 from CryptoMobile.ECIES import *
 from CryptoMobile.EC    import (
     X25519,
@@ -51,6 +52,8 @@ from CryptoMobile.EC    import (
 def test_profileA():
     hn_privkey  = unhexlify('c53c22208b61860b06c62e5406a7b330c2b577aa5558981510d128247d38bd1d')
     hn_pubkey   = unhexlify('5a8d38864820197c3394b92613b20b91633cbd897119273bf8e4a6f4eec0a650')
+    hn_privkey_pem = b'-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VuBCIEIMU8IiCLYYYLBsYuVAanszDCtXeqVViYFRDRKCR9OL0d\n-----END PRIVATE KEY-----\n'
+
     eph_privkey = unhexlify('c80949f13ebe61af4ebdbd293ea4f942696b9e815d7e8f0096bbf6ed7de62256')
     eph_pubkey  = unhexlify('b2e92f836055a255837debf850b528997ce0201cb82adfe4be1f587d07d8457d')
     shared_key  = unhexlify('028ddf890ec83cdf163947ce45f6ec1a0e3070ea5fe57e2b1f05139f3e82422a')
@@ -74,14 +77,18 @@ def test_profileA():
     x1.generate_sharedkey(hn_pubkey) == shared_key and \
     x2.get_pubkey() == hn_pubkey and \
     x2.get_privkey() == hn_privkey and \
+    x2.get_privkey(encoding=serialization.Encoding.PEM,
+                   format=serialization.PrivateFormat.PKCS8) == hn_privkey_pem and \
     x2.generate_sharedkey(eph_pubkey) == shared_key and \
     ue_ct == ciphertext and ue_mac == mactag and hn_ct == plaintext
 
 
-# annex C.4.4, ECIES Profile A test data
+# annex C.4.4, ECIES Profile B test data
 def test_profileB():
     hn_pubkey   = unhexlify('0272DA71976234CE833A6907425867B82E074D44EF907DFB4B3E21C1C2256EBCD1') # compressed
     hn_privkey  = unhexlify('F1AB1074477EBCC7F554EA1C5FC368B1616730155E0041AC447D6301975FECDA')
+    hn_privkey_pem = b'-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg8asQdEd+vMf1VOoc\nX8NosWFnMBVeAEGsRH1jAZdf7NqhRANCAARy2nGXYjTOgzppB0JYZ7guB01E75B9\n+0s+IcHCJW680Vp97VL8uwl6TtJQ4DbHucjHAExO7cTwaM17+NP5AOO0\n-----END PRIVATE KEY-----\n'
+
     eph_pubkey  = unhexlify('039AAB8376597021E855679A9778EA0B67396E68C66DF32C0F41E9ACCA2DA9B9D1') # compressed
     eph_privkey = unhexlify('99798858A1DC6A2C68637149A4B1DBFD1FDFF5ADDD62A2142F06699ED7602529')
     shared_key  = unhexlify('6C7E6518980025B982FBB2FF746E3C2E85A196D252099A7AD23EA7B4C0959CAE')
@@ -105,6 +112,7 @@ def test_profileB():
     x1.generate_sharedkey(hn_pubkey) == shared_key and \
     x2.get_pubkey() == hn_pubkey and \
     x2.get_privkey() == hn_privkey and \
+    x2.get_privkey_pem() == hn_privkey_pem and \
     x2.generate_sharedkey(eph_pubkey) == shared_key and \
     ue_ct == ciphertext and ue_mac == mactag and hn_ct == plaintext
 
