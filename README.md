@@ -9,7 +9,7 @@ algorithms, and ECIES identity protection scheme.
 
 ## Disclaimer
 This is delivered for study only: beware that cryptographic material, 
-especially ciphering algorithms are always subject to national regulation.
+especially ciphering algorithms may be subject to national regulation.
 Moreover, use in real networks and equipments of some of the algorithms provided
 are subect to agreement / licensing by the GSMA and / or the ETSI:
 see [GSMA](https://www.gsma.com/aboutus/leadership/committees-and-groups/working-groups/fraud-security-group/security-algorithms)
@@ -21,16 +21,16 @@ The standard installation process is to use the CPython build environment to com
 C files and install them together with the Python wrappers. The Milenage and EEA2/EIA2
 algorithms moreover require one of the following Python cryptographic library to support
 AES:
-- [pycryptodome](https://www.pycryptodome.org/) or
-- [cryptography](https://cryptography.io/en/latest/)
-
-The ECIES module requires the last one (cryptography) to work, as no support for ECIES 
-with pycryptodome as been developped yet.
+- [cryptography](https://cryptography.io/en/latest/) or
+- [pycryptodome](https://www.pycryptodome.org/)
 
 
-This library supports both Python 2.7 and 3.X versions.
-An installation script is available: it installs the library within your Python 
-package directory:
+The ECIES module requires _cryptography_ to work, as no support for ECIES is expected in pycryptodome.
+
+
+This library supports Python 3.X versions. It is known to work on the most common operating systems, 
+too (Linux, Windows, MacOS).
+An installation script is available. It installs the library within your Python package directory:
 
 ```
 python setup.py install
@@ -57,15 +57,7 @@ For generic info on building C extensions on Windows, see the
 When building on a Windows system using the MSVC compiler, the .c files will be automatically
 renamed to .cc by the install script in order to get them compiled correctly by the MSVC compiler.
 
-To be noted also that the library builds and runs fine with pypy3.
-
-
-### Installing the ctypes version instead of the CPython wrappers
-There is still the possibility to install manually the historical version (before 2019) 
-of the library which uses Python-only _ctypes_ source files. A *CM_ctypes.py* is available 
-in the \_ctypes directory for this purpose.
-Please note that this part is not supported anymore, no more tested, and may not work correctly
-or even at all.
+Please note that the library builds and runs fine with pypy3, too.
 
 
 ## Usage
@@ -162,11 +154,6 @@ b'\xf7~|\x95\x9e\xbf\xfb?'
 >>> Mil.unset_opc()
 ```
 
-Some conversion functions are also provided in the Milenage module:
-- conv\_C2, conv\_C3, conv\_C4 and conv\_C5 for 2G / 3G authentication vectors conversion
-- conv\_A2, conv\_A3, conv\_A4 and conv\_A7 for LTE key derivation and 3G / LTE authentication 
-   vectors conversion
-
 
 ### TUAK
 This is the Python wrapper over the TUAK algorithm. The mode of operation is written
@@ -203,6 +190,14 @@ b'\xdd\xf1\xc7w\x11x\xce\xdb'
 
 TOPc handling is similar as in Milenage and can be set explicitly through the set\_topc() method
 before calling f1() and f2345() methods several times, then finally unset with unset\_topc() method.
+ 
+
+### Conversion and key-derivation functions
+Many conversion and key-derivation functions are provided in the _conv_ module:
+- the generic KDF
+- conv102\_C* for 2G/3G authentication vectors conversion
+- conv401\_A* for LTE key derivation and 3G / LTE authentication vectors conversion
+- conv501\_A* for NR key derivation and LTE / NR authentication vectors conversion
  
 
 ### Kasumi-based encryption and integrity protection algorithms
@@ -299,12 +294,12 @@ b'\xda\x9as,\x97:\x86)]\xde\x8b\x14Qq\x85\x15cME$\xc4)\xe7\x7f@\xfe\x10\x1f\xcd\
 b'X\xcb\xa1\x9c'
 ```
 
-### The CM module, gathering all 3G and LTE encryption and integrity protection algorithms in one place
-The CM module implements each algorithm as a class, with its primitives and 3G and / or LTE
+### The CM module, gathering all 3G, LTE and NR encryption and integrity protection algorithms in one place
+The CM module implements each algorithm as a class, with its primitives and 3G, LTE and / or NR
 modes of operation as specific methods.
 Finally, UEA and UIA are aliases for the given UMTS encryption and integrity protection
 algorithms, and EEA and EIA are aliases for the given LTE encryption and integrity
-protection algorithms.
+protection algorithms. NR algorithms are the same as the LTE ones.
 
 Here is an example with the 2nd UMTS algorithm (SNOW-3G based) and the 2nd and 3rd 
 LTE algorithms (AES-based and ZUC-based):
@@ -411,8 +406,6 @@ The library is structured into 3 main parts:
 
 And two additional folders:
 - test: provides files with test vectors.
-- \_ctypes: provides the old CM module which uses ctypes binding to the C files
-  compiled as shared object.
 
 Within the CryptoMobile directory, we have the following modules:
 - utils.py: provides common routine (eg log() and exception) for the library
@@ -420,7 +413,8 @@ Within the CryptoMobile directory, we have the following modules:
 - CMAC.py: provides a CMAC class which implement the CMAC mode of operation
 - CM.py: the main module providing classes KASUMI, SNOW3G, ZUC (making use of the
   wrappers in C\_py) and AES\_3GPP (making use of the AES backend),
-  and functions UEA1, UIA1, UEA2, UIA2, EEA1, EIA1, EEA2, EIA2, EEA3 and EIA3. 
+  and functions UEA1, UIA1, UEA2, UIA2, EEA1, EIA1, EEA2, EIA2, EEA3 and EIA3.
+- conv.py: most of the conversion functions used as key derivation in 3GPP specifications.
 - Milenage.py: provides the Milenage algorithm and conversion functions to be used
   for keys and authentication vectors conversion.
 - TUAK.py: provides the TUAK algorithm.
@@ -433,4 +427,3 @@ Within the CryptoMobile directory, we have the following modules:
   reference C source code
 - FreeRADIUS, Hacking projects, Sylvain Munaut, for the comp128.c source code
 - Developers and maintainers of pycrypto, pycryptodome and cryptography Python libraries 
-
